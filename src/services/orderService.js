@@ -9,6 +9,14 @@ export const FREE_DELIVERY_OVER = 3000
 
 export const deliveryFee = (subtotal) => (subtotal === 0 || subtotal >= FREE_DELIVERY_OVER ? 0 : DELIVERY_FEE)
 
+// The four stages every order moves through.
+export const orderStages = [
+  { id: 'Confirmed', text: 'We have your order and are getting it ready.' },
+  { id: 'Packed', text: 'Your items are packed and waiting for the delivery team.' },
+  { id: 'Out for Delivery', text: 'The delivery team is on the way to you.' },
+  { id: 'Delivered', text: 'Your order has arrived. Enjoy your new items!' },
+]
+
 function readAll() {
   try {
     return JSON.parse(localStorage.getItem(ORDERS_KEY)) || []
@@ -22,6 +30,7 @@ export async function createOrder(details) {
     ...details,
     reference: `HL-O-${Date.now().toString().slice(-6)}`,
     status: 'Confirmed',
+    history: [{ status: 'Confirmed', at: new Date().toISOString() }],
     createdAt: new Date().toISOString(),
   }
   try {
@@ -34,4 +43,21 @@ export async function createOrder(details) {
 
 export async function getMyOrders() {
   return readAll()
+}
+
+// DEMO ONLY: moves an order to its next stage (the vendor side is not built yet).
+export async function advanceOrder(reference) {
+  const order = orderStages.map((s) => s.id)
+  const orders = readAll().map((o) => {
+    if (o.reference !== reference) return o
+    const next = order[order.indexOf(o.status) + 1]
+    if (!next) return o
+    return { ...o, status: next, history: [...(o.history || []), { status: next, at: new Date().toISOString() }] }
+  })
+  try {
+    localStorage.setItem(ORDERS_KEY, JSON.stringify(orders))
+  } catch {
+    // Storage blocked: the change is not saved.
+  }
+  return orders
 }

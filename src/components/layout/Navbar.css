@@ -111,6 +111,12 @@
 }
 
 /* ---- Tablet and phone ---- */
+/* Signed in / signed out area */
+.navbar__account { display: flex; align-items: center; gap: var(--space-3); }
+.navbar__logout, .navbar__login { border: 0; background: none; color: var(--color-text); font-family: inherit; font-size: 13px; font-weight: 700; cursor: pointer; white-space: nowrap; }
+.navbar__logout:hover, .navbar__login:hover { color: var(--color-primary); }
+.navbar__signup { padding: 8px 16px; border-radius: var(--radius-pill); background: var(--color-primary-soft); color: var(--color-primary); font-size: 13px; font-weight: 700; white-space: nowrap; }
+
 @media (max-width: 1000px) {
   .navbar__search { display: none; }
 }

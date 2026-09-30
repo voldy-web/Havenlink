@@ -53,3 +53,14 @@ export async function createViewing(details) {
 export async function getMyViewings() {
   return readAll()
 }
+
+// Cancels a viewing request. It stays in the list marked "Cancelled".
+export async function cancelViewing(reference) {
+  const list = readAll().map((v) => (v.reference === reference ? { ...v, status: 'Cancelled' } : v))
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(list))
+  } catch {
+    // Storage blocked: the change is not saved.
+  }
+  return list
+}

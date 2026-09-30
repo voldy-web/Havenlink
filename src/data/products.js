@@ -1,4 +1,5 @@
 import { photo } from './photos'
+import { moreProducts } from './productCatalog'
 
 // Mock shop products. Later these come from the backend
 // (see src/services/productService.js).
@@ -24,7 +25,7 @@ const sectional = photo('home-city-lounge')
 const greyKitchen = photo('home-grey-kitchen')
 const diningSet = photo('home-dining-room')
 
-export const products = [
+const baseProducts = [
   {
     id: 1, sku: 'HL-BD-1001', name: 'Nordic Oak Platform Bed Frame (Queen)', category: 'beds',
     vendor: 'Haven Studio', material: 'Solid Oak', price: 2400, rating: 4.9, reviews: 142,
@@ -129,3 +130,6 @@ export const products = [
     specs: [['Table', '120 cm round'], ['Chairs', '4, upholstered'], ['Material', 'Solid oak'], ['Assembly', 'About 30 minutes'], ['Warranty', '3 years']],
   },
 ]
+
+// The first 12 are hand-written with photos; the rest are generated (see productCatalog.js).
+export const products = [...baseProducts, ...moreProducts]

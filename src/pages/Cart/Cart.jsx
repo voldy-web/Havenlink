@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import Icon from '../../components/ui/Icon'
 import Button from '../../components/ui/Button'
+import ProductImage from '../../components/ui/ProductImage'
 import PaymentForm from '../../components/ui/PaymentForm'
 import { useCart } from '../../hooks/useCart'
 import { getProductsByIds } from '../../services/productService'
@@ -164,7 +165,7 @@ export default function Cart() {
                 const options = Object.values(l.choices || {}).join(' · ')
                 return (
                   <li key={l.key}>
-                    {p && <Link to={`/shop/${p.id}`}><img src={p.image} alt="" /></Link>}
+                    {p && <Link to={`/shop/${p.id}`}><ProductImage product={p} alt="" /></Link>}
                     <div className="cart-items__info">
                       <h3>{p ? <Link to={`/shop/${p.id}`}>{p.name}</Link> : 'Item'}</h3>
                       {options && <p>{options}</p>}

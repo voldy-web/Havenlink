@@ -172,3 +172,7 @@
 @media (max-width: 900px) {
   .product__top { grid-template-columns: 1fr; }
 }
+
+.product__photo .product-art { aspect-ratio: 4 / 3; }
+.product__photo .product-art svg { width: 96px; height: 96px; }
+.product__photo .product-art b { font-size: 18px; }

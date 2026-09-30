@@ -1,0 +1,7 @@
+.product-art { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; width: 100%; height: 100%; min-height: 100px; background: linear-gradient(135deg, var(--color-primary-soft), var(--color-bg-alt)); color: var(--color-primary); text-align: center; }
+.product-art b { font-size: 13px; color: var(--color-navy); }
+.product-art small { font-size: 11px; color: var(--color-text-light); }
+.product-art--small { background: linear-gradient(135deg, #e6f4ef, #eef3ff); }
+.product-art--appliances { background: linear-gradient(135deg, #e3eefb, #eaf6f2); }
+.product-art--kitchen { background: linear-gradient(135deg, #fbefdc, #eef6ef); }
+.product-art--decor { background: linear-gradient(135deg, #f3e8f7, #eaf3f0); }

@@ -4,6 +4,7 @@ import logo from '../../assets/logo.png'
 import Button from '../ui/Button'
 import Icon from '../ui/Icon'
 import { useCart } from '../../hooks/useCart'
+import { useAuth } from '../../hooks/useAuth'
 import './Navbar.css'
 
 // Main navigation links, in the order shown in the design.
@@ -19,6 +20,7 @@ const links = [
 export default function Navbar() {
   const { pathname, search } = useLocation()
   const { count } = useCart()
+  const { user, logout } = useAuth()
 
   // A link is "active" when its page is open. Buy and Rent share the
   // /properties page, so for those we also compare the ?type= value.
@@ -69,11 +71,20 @@ export default function Navbar() {
           + Post Property
         </Button>
 
-        {/* Placeholder user chip. Becomes real once login is built. */}
-        <Link to="/login" className="navbar__user" onClick={closeMenu}>
-          <span className="navbar__avatar" aria-hidden="true">MV</span>
-          <span className="navbar__username">Marcus Vance</span>
-        </Link>
+        {user ? (
+          <div className="navbar__account">
+            <Link to="/dashboard" className="navbar__user" onClick={closeMenu}>
+              <span className="navbar__avatar" aria-hidden="true">{user.name.split(' ').map((w) => w[0]).slice(0, 2).join('').toUpperCase()}</span>
+              <span className="navbar__username">{user.name.split(' ')[0]}</span>
+            </Link>
+            <button type="button" className="navbar__logout" onClick={() => { logout(); closeMenu() }}>Log out</button>
+          </div>
+        ) : (
+          <div className="navbar__account">
+            <Link to="/login" className="navbar__login" onClick={closeMenu}>Log in</Link>
+            <Link to="/register" className="navbar__signup" onClick={closeMenu}>Sign up</Link>
+          </div>
+        )}
 
         <button
           className="navbar__toggle"

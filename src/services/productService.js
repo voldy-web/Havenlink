@@ -2,7 +2,7 @@
 // in the browser; later only the inside of these functions changes.
 import { products } from '../data/products'
 
-const PER_PAGE = 6
+const PER_PAGE = 12
 
 export async function getProducts(filters) {
   const { q, categories, minPrice, maxPrice, vendors, materials, rating, sort, page } = filters

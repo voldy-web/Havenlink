@@ -26,7 +26,17 @@ export const amenityGroups = [
 ]
 
 // Places near each city's listings. Replace with real data later.
+const genericNearby = [
+  { icon: 'bag', name: 'Local Market', distance: '5 min drive' },
+  { icon: 'home', name: 'Main Road / Transport', distance: '3 min walk' },
+  { icon: 'tool', name: 'Clinic / Hospital', distance: '10 min drive' },
+]
+
 export const nearbyByCity = {
+  Tema: genericNearby,
+  Kasoa: genericNearby,
+  Tamale: genericNearby,
+  'Cape Coast': genericNearby,
   Accra: [
     { icon: 'bag', name: 'Shopping Mall', distance: '5 min drive' },
     { icon: 'home', name: 'Local Market', distance: '3 min drive' },

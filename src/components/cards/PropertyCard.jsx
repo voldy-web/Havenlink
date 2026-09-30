@@ -1,7 +1,7 @@
-import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import Icon from '../ui/Icon'
 import Button from '../ui/Button'
+import { useSaved } from '../../hooks/useSaved'
 import { formatPrice } from '../../utils/format'
 import { comforts } from '../../data/propertyOptions'
 import './PropertyCard.css'
@@ -13,9 +13,9 @@ export default function PropertyCard({ property, compact = false, layout = 'grid
   const { id, title, address, area, listingType, price, badge, label, highlight,
     beds, baths, sqm, features, photos, note, action, image } = property
 
-  // Favourite toggle. Only remembered while the page is open for now;
-  // it will be saved to the account once login exists.
-  const [saved, setSaved] = useState(false)
+  // Saved homes are remembered in the browser (and shown on the dashboard).
+  const { isSaved, toggle } = useSaved()
+  const saved = isSaved(id)
 
   const featureLabels = comforts
     .filter((c) => features?.includes(c.id))
@@ -41,7 +41,7 @@ export default function PropertyCard({ property, compact = false, layout = 'grid
         className={`property-card__heart ${saved ? 'is-saved' : ''}`}
         aria-label={saved ? 'Remove from saved' : 'Save property'}
         aria-pressed={saved}
-        onClick={() => setSaved(!saved)}
+        onClick={() => toggle(id)}
       >
         <Icon name="heart" size={16} />
       </button>

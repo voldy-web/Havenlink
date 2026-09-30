@@ -1,0 +1,49 @@
+.mr { display: flex; flex-direction: column; gap: var(--space-4); }
+.mr__head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-3); }
+.mr__head h1 { font-size: clamp(26px, 4vw, 34px); }
+.mr__head p { margin: var(--space-1) 0 0; }
+.mr__tabs { display: flex; flex-wrap: wrap; gap: var(--space-2); padding: var(--space-2); border-radius: var(--radius-md); background: var(--color-surface); box-shadow: var(--shadow-card); }
+.mr__tabs button { display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; border: 0; border-radius: var(--radius-sm); background: none; color: var(--color-navy); font-family: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }
+.mr__tabs button span { color: var(--color-text-light); font-weight: 600; }
+.mr__tabs button.is-active { background: var(--color-primary-soft); color: var(--color-primary); }
+.mr__list { display: flex; flex-direction: column; gap: var(--space-4); }
+
+.rcard { padding: var(--space-5); border-radius: var(--radius-md); background: var(--color-surface); box-shadow: var(--shadow-card); }
+.rcard header { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); margin-bottom: var(--space-3); }
+.rcard header small { flex: 1; font-size: 12px; color: var(--color-text-light); }
+.rcard__urg, .rcard__cat, .rcard__status { padding: 3px 12px; border-radius: var(--radius-pill); font-size: 11px; font-weight: 700; text-transform: uppercase; }
+.rcard__urg { background: var(--color-chip); color: var(--color-navy); }
+.rcard__urg--medium { background: var(--color-primary-soft); color: var(--color-primary); }
+.rcard__urg--urgent { background: #fdecea; color: var(--color-danger); }
+.rcard__cat { background: var(--color-bg-alt); color: var(--color-text); }
+.rcard__status { background: var(--color-primary-soft); color: var(--color-primary); }
+.rcard__status.is-done { background: var(--color-primary); color: #fff; }
+.rcard h2 { font-size: 21px; }
+.rcard > p { margin: var(--space-2) 0 0; font-size: 14px; }
+.rcard .rcard__where { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--color-text-light); }
+
+.rcard__steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-2); margin: var(--space-4) 0 var(--space-2); padding: var(--space-3); border-radius: var(--radius-md); background: var(--color-bg-alt); list-style: none; }
+.rcard__steps li { display: flex; align-items: flex-start; gap: 8px; padding: var(--space-2); border-radius: var(--radius-sm); opacity: 0.6; }
+.rcard__steps li.is-done, .rcard__steps li.is-current { opacity: 1; }
+.rcard__steps li.is-current { background: var(--color-primary-soft); }
+.rcard__steps span { display: grid; place-items: center; flex: none; width: 24px; height: 24px; border-radius: 50%; background: var(--color-chip); font-size: 12px; font-weight: 700; color: var(--color-navy); }
+.rcard__steps .is-done span, .rcard__steps .is-current span { background: var(--color-primary); color: #fff; }
+.rcard__steps div { display: flex; flex-direction: column; min-width: 0; }
+.rcard__steps b { font-size: 13px; color: var(--color-navy); }
+.rcard__steps small { font-size: 11px; }
+.rcard__now { margin: 0; font-size: 13px; font-weight: 600; color: var(--color-primary); }
+.rcard__photos { display: flex; flex-wrap: wrap; gap: var(--space-2); margin-top: var(--space-4); }
+.rcard__photos button { width: 96px; height: 76px; padding: 0; border: 0; border-radius: var(--radius-sm); overflow: hidden; cursor: zoom-in; }
+.rcard__photos img { width: 100%; height: 100%; object-fit: cover; }
+.rcard__demo { margin-top: var(--space-4); padding: 6px 14px; border: 1px dashed var(--color-text-light); border-radius: var(--radius-pill); background: none; color: var(--color-text); font-family: inherit; font-size: 12px; cursor: pointer; }
+
+@media (max-width: 700px) { .rcard__steps { grid-template-columns: 1fr 1fr; } }
+
+/* Shared by the Orders and Viewings pages */
+.orders__items { margin: var(--space-3) 0 0; padding: 0; list-style: none; }
+.orders__items li { display: flex; justify-content: space-between; gap: var(--space-4); padding: 6px 0; font-size: 14px; }
+.orders__items small { color: var(--color-text-light); }
+.rcard__status.is-cancelled { background: var(--color-chip); color: var(--color-text); }
+.viewings__actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); margin-top: var(--space-4); }
+.viewings__actions .rcard__demo { margin: 0; }
+.rcard h2 a:hover { color: var(--color-primary); }

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import Icon from '../ui/Icon'
+import ProductImage from '../ui/ProductImage'
 import { useCart } from '../../hooks/useCart'
 import { defaultChoices, unitPriceFor } from '../../utils/productHelpers'
 import { formatPrice } from '../../utils/format'
@@ -8,7 +9,7 @@ import './ProductCard.css'
 
 // One product in the shop grid.
 export default function ProductCard({ product }) {
-  const { id, name, vendor, rating, reviews, badge, tag, dims, feature, delivery, price, oldPrice, image } = product
+  const { id, name, vendor, rating, reviews, badge, tag, dims, feature, delivery, price, oldPrice, stock } = product
   const { addItem } = useCart()
   const [saved, setSaved] = useState(false)
   const [added, setAdded] = useState(false)
@@ -24,7 +25,7 @@ export default function ProductCard({ product }) {
   return (
     <article className="product-card">
       <Link to={`/shop/${id}`} className="product-card__media">
-        <img src={image} alt={name} loading="lazy" />
+        <ProductImage product={product} />
         <span className="product-card__badge">{badge}</span>
         <span className="product-card__tag">{tag}</span>
       </Link>
@@ -51,8 +52,8 @@ export default function ProductCard({ product }) {
             {oldPrice && <s>{formatPrice(oldPrice)}</s>}
             <small>{delivery}</small>
           </div>
-          <button onClick={add} aria-live="polite">
-            <Icon name={added ? 'check' : 'bag'} size={15} /> {added ? 'Added' : 'Add to Cart'}
+          <button onClick={add} disabled={stock === 0} aria-live="polite">
+            <Icon name={added ? 'check' : 'bag'} size={15} /> {stock === 0 ? 'Sold out' : added ? 'Added' : 'Add to Cart'}
           </button>
         </div>
       </div>

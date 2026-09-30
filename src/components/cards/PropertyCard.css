@@ -169,3 +169,6 @@
     min-height: 200px;
   }
 }
+
+.property-card__badge--rented,
+.property-card__badge--sold { background: var(--color-chip); color: var(--color-text); }

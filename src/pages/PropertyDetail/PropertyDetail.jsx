@@ -9,6 +9,7 @@ import {
   getPropertyById, getSimilarProperties, getAgentById,
 } from '../../services/propertyService'
 import { buildDetails } from '../../utils/propertyDetails'
+import { useSaved } from '../../hooks/useSaved'
 import { formatPrice } from '../../utils/format'
 import './PropertyDetail.css'
 
@@ -18,7 +19,7 @@ export default function PropertyDetail() {
   // `id` in the state records which listing the data belongs to, so we can
   // tell when the page is still loading a newly chosen listing.
   const [data, setData] = useState({ id: null, property: null, agent: null, similar: [] })
-  const [saved, setSaved] = useState(false)
+  const { isSaved, toggle } = useSaved()
   const [copied, setCopied] = useState(false)
 
   useEffect(() => {
@@ -39,6 +40,7 @@ export default function PropertyDetail() {
   }, [id])
 
   const { property, agent, similar } = data
+  const saved = property ? isSaved(property.id) : false
   const details = useMemo(() => (property ? buildDetails(property) : null), [property])
 
   // Start each listing at the top of the page.
@@ -118,7 +120,7 @@ export default function PropertyDetail() {
               aria-label={saved ? 'Remove from saved' : 'Save property'}
               aria-pressed={saved}
               className={saved ? 'is-saved' : ''}
-              onClick={() => setSaved(!saved)}
+              onClick={() => toggle(property.id)}
             >
               <Icon name="heart" size={16} />
             </button>

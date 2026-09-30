@@ -1,4 +1,5 @@
 import { photo } from './photos'
+import { moreProperties } from './propertiesMore'
 
 // Mock property listings. Later these come from the backend
 // (see src/services/propertyService.js).
@@ -30,7 +31,7 @@ const sofaLounge = photo('home-sofa-lounge')
 //   agentId      who looks after the listing (see data/agents.js)
 //   lat, lng     position used for the map on the detail page
 //   detailImage  optional larger photo for the detail page gallery
-export const properties = [
+const baseProperties = [
   {
     id: 1,
     agentId: 1,
@@ -336,3 +337,6 @@ export const properties = [
     categories: ['Family Homes'], image: sofaLounge,
   },
 ]
+
+// The first 15 are hand-written; the rest are generated (see propertiesMore.js).
+export const properties = [...baseProperties, ...moreProperties]

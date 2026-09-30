@@ -89,3 +89,5 @@
   cursor: pointer;
 }
 .product-card__buy button:hover { background: var(--color-primary-dark); }
+
+.product-card__buy button:disabled { background: var(--color-chip); color: var(--color-text-light); cursor: not-allowed; }

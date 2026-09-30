@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom'
 import Icon from '../../components/ui/Icon'
 import Button from '../../components/ui/Button'
 import ProductCard from '../../components/cards/ProductCard'
+import ProductImage from '../../components/ui/ProductImage'
 import { useCart } from '../../hooks/useCart'
 import { getProductById, getRelatedProducts } from '../../services/productService'
 import { defaultChoices, unitPriceFor, swatchColors } from '../../utils/productHelpers'
@@ -70,7 +71,7 @@ export default function ProductDetail() {
 }
 
 function ProductBuy({ product, addItem }) {
-  const photos = useMemo(() => product.gallery || [product.image], [product])
+  const photos = useMemo(() => product.gallery || [product.image || null], [product])
   const [photo, setPhoto] = useState(0)
   const [choices, setChoices] = useState(() => defaultChoices(product))
   const [qty, setQty] = useState(1)
@@ -92,7 +93,7 @@ function ProductBuy({ product, addItem }) {
       <div className="product__top">
         <div className="product__gallery">
           <div className="product__photo">
-            <img src={photos[photo]} alt={product.name} />
+            <ProductImage product={product} src={photos[photo] ?? undefined} />
             <span className="product__badge">{product.badge}</span>
             <button
               className={`product__heart ${saved ? 'is-saved' : ''}`}
@@ -103,7 +104,7 @@ function ProductBuy({ product, addItem }) {
               <Icon name="heart" size={18} />
             </button>
           </div>
-          {photos.length > 1 && (
+          {photos.length > 1 && photos[0] && (
             <div className="product__thumbs">
               {photos.map((src, i) => (
                 <button
