@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import Icon from '../../components/ui/Icon'
 import Button from '../../components/ui/Button'
 import { getMyOrders, advanceOrder, orderStages } from '../../services/orderService'
+import { demoTools } from '../../services/api'
 import { longDate, fromISO } from '../../utils/dates'
 import { formatPrice } from '../../utils/format'
 import '../MyReports/MyReports.css'
@@ -70,7 +71,7 @@ export default function Orders() {
                 </ol>
                 <p className="rcard__now">{orderStages[at].text}</p>
 
-                {o.status !== 'Delivered' && (
+                {demoTools && o.status !== 'Delivered' && (
                   <button className="rcard__demo" onClick={async () => setOrders(await advanceOrder(o.reference))}>
                     Demo: move to next stage
                   </button>

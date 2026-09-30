@@ -3,6 +3,7 @@
 // the same. The owner side (acknowledging, assigning) is not built yet, so
 // advanceReport() lets you step a report forward to try the tracker.
 import { reportStages } from '../data/reportOptions'
+import { apiEnabled, apiOrThrow } from './api'
 
 const KEY = 'havenlink_reports'
 
@@ -23,7 +24,7 @@ function writeAll(reports) {
   }
 }
 
-export async function createReport(details) {
+async function demoCreateReport(details) {
   const now = new Date().toISOString()
   const report = {
     ...details,
@@ -38,12 +39,12 @@ export async function createReport(details) {
   return report
 }
 
-export async function getMyReports() {
+async function demoGetMyReports() {
   return readAll()
 }
 
 // DEMO ONLY: moves a report to its next stage.
-export async function advanceReport(reference) {
+async function demoAdvanceReport(reference) {
   const order = reportStages.map((s) => s.id)
   const reports = readAll().map((r) => {
     if (r.reference !== reference) return r
@@ -52,4 +53,17 @@ export async function advanceReport(reference) {
   })
   writeAll(reports)
   return reports
+}
+
+// ---- What the pages use: the real API when connected, otherwise the browser demo ----
+export const createReport = (details) =>
+  apiEnabled ? apiOrThrow('/reports', { method: 'POST', body: details }).then((d) => d.report) : demoCreateReport(details)
+
+export const getMyReports = () =>
+  apiEnabled ? apiOrThrow('/reports').then((d) => d.reports) : demoGetMyReports()
+
+export async function advanceReport(reference) {
+  if (!apiEnabled) return demoAdvanceReport(reference)
+  await apiOrThrow(`/reports/${reference}/advance`, { method: 'PATCH' })
+  return getMyReports()
 }

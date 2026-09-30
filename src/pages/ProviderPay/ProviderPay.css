@@ -146,3 +146,5 @@
   .contact-reveal { grid-template-columns: 1fr; }
   .stepper { gap: var(--space-3); }
 }
+
+.pay__error { margin: 0; padding: var(--space-3) var(--space-4); border-radius: var(--radius-sm); background: #fdecea; color: var(--color-danger); font-size: 13px; font-weight: 600; }

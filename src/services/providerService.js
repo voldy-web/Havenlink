@@ -2,6 +2,7 @@
 // data in the browser; later only the inside of these functions changes.
 import { providers } from '../data/providers'
 import { trades } from '../data/serviceCategories'
+import { apiEnabled, apiOrThrow } from './api'
 
 const PER_PAGE = 6
 
@@ -68,7 +69,7 @@ function readRequests() {
   }
 }
 
-export async function createServiceRequest(details) {
+async function demoCreateServiceRequest(details) {
   const request = {
     ...details,
     reference: `HL-S-${Date.now().toString().slice(-6)}`,
@@ -83,6 +84,13 @@ export async function createServiceRequest(details) {
   return request
 }
 
-export async function getMyServiceRequests() {
+async function demoGetMyServiceRequests() {
   return readRequests()
 }
+
+// ---- What the pages use: the real API when connected, otherwise the browser demo ----
+export const createServiceRequest = (details) =>
+  apiEnabled ? apiOrThrow('/service-requests', { method: 'POST', body: details }).then((d) => d.request) : demoCreateServiceRequest(details)
+
+export const getMyServiceRequests = () =>
+  apiEnabled ? apiOrThrow('/service-requests').then((d) => d.requests) : demoGetMyServiceRequests()

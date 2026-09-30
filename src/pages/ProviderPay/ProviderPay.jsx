@@ -83,7 +83,9 @@ export default function ProviderPay() {
     // DEMO: pretend the payment takes a moment. A real payment provider
     // (mobile money / card gateway) will be connected with the backend.
     await new Promise((resolve) => setTimeout(resolve, 1200))
-    const request = await createServiceRequest({
+    let request
+    try {
+      request = await createServiceRequest({
       providerId: p.id,
       providerName: p.name,
       service,
@@ -93,7 +95,12 @@ export default function ProviderPay() {
       fee: p.fee,
       // Only the method is kept. Card and phone details are never stored.
       method: paymentLabel(payment),
-    })
+      })
+    } catch (err) {
+      setPaying(false)
+      setErrors({ form: err.message })
+      return
+    }
     setPaying(false)
     setDone(request)
   }
@@ -210,6 +217,7 @@ export default function ProviderPay() {
               </div>
             </section>
 
+            {errors.form && <p className="pay__error" role="alert">{errors.form}</p>}
             <button type="submit" className="pay__confirm" disabled={paying}>
               <Icon name="lock" size={16} />
               {paying ? 'Processing payment…' : `Pay ${formatPrice(p.fee)} & Unlock Contact`}

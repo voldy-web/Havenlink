@@ -3,6 +3,7 @@ import { Link, useParams, useSearchParams } from 'react-router-dom'
 import Icon from '../../components/ui/Icon'
 import Button from '../../components/ui/Button'
 import ViewingCalendar from './ViewingCalendar'
+import { useAuth } from '../../hooks/useAuth'
 import { getPropertyById, getAgentById } from '../../services/propertyService'
 import { createViewing, getDayStatus, getSlots } from '../../services/viewingService'
 import { fromISO, isValidISO, longDate, startOfToday, toISO } from '../../utils/dates'
@@ -29,6 +30,7 @@ function firstOpenDay(today) {
 export default function BookViewing() {
   const { id } = useParams()
   const [query] = useSearchParams()
+  const { user } = useAuth()
 
   const [loaded, setLoaded] = useState({ id: null, property: null, agent: null })
   const [today] = useState(() => startOfToday())
@@ -48,7 +50,7 @@ export default function BookViewing() {
     const d = fromISO(wanted)
     return Math.max(0, Math.min(2, (d.getFullYear() - t.getFullYear()) * 12 + d.getMonth() - t.getMonth()))
   })
-  const [form, setForm] = useState(emptyForm)
+  const [form, setForm] = useState(() => ({ ...emptyForm, name: user?.name || '', email: user?.email || '', phone: user?.phone || '' }))
   const [errors, setErrors] = useState({})
   const [booking, setBooking] = useState(null)
 
@@ -108,16 +110,21 @@ export default function BookViewing() {
       first?.scrollIntoView({ behavior: 'smooth', block: 'center' })
       return
     }
-    const saved = await createViewing({
-      propertyId: property.id,
-      propertyTitle: property.title,
-      format,
-      date,
-      time,
-      ...form,
-      name: form.name.trim(),
-    })
-    setBooking(saved)
+    try {
+      const saved = await createViewing({
+        propertyId: property.id,
+        propertyTitle: property.title,
+        format,
+        date,
+        time,
+        ...form,
+        name: form.name.trim(),
+      })
+      setBooking(saved)
+    } catch (err) {
+      // For example: the server is unreachable, or this time is already booked by you.
+      setErrors({ form: err.message })
+    }
   }
 
   const forRent = property.listingType === 'rent'
@@ -357,6 +364,7 @@ export default function BookViewing() {
                 </p>
               </div>
 
+              {errors.form && <p className="book__error" role="alert">{errors.form}</p>}
               <button type="submit" className="summary__confirm">
                 Confirm &amp; Book Viewing — Free <Icon name="arrow" size={16} />
               </button>

@@ -2,6 +2,7 @@
 // are saved in the browser (localStorage) so they survive a page refresh.
 // When the backend exists, these functions will call the API instead and
 // the booking page will not need to change.
+import { apiEnabled, apiOrThrow } from './api'
 
 const STORAGE_KEY = 'havenlink_viewings'
 
@@ -35,7 +36,7 @@ function readAll() {
 }
 
 // Saves a booking request and returns it with a reference number.
-export async function createViewing(details) {
+async function demoCreateViewing(details) {
   const booking = {
     ...details,
     reference: `HL-V-${Date.now().toString().slice(-6)}`,
@@ -50,12 +51,12 @@ export async function createViewing(details) {
   return booking
 }
 
-export async function getMyViewings() {
+async function demoGetMyViewings() {
   return readAll()
 }
 
 // Cancels a viewing request. It stays in the list marked "Cancelled".
-export async function cancelViewing(reference) {
+async function demoCancelViewing(reference) {
   const list = readAll().map((v) => (v.reference === reference ? { ...v, status: 'Cancelled' } : v))
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(list))
@@ -63,4 +64,17 @@ export async function cancelViewing(reference) {
     // Storage blocked: the change is not saved.
   }
   return list
+}
+
+// ---- What the pages use: the real API when connected, otherwise the browser demo ----
+export const createViewing = (details) =>
+  apiEnabled ? apiOrThrow('/viewings', { method: 'POST', body: details }).then((d) => d.viewing) : demoCreateViewing(details)
+
+export const getMyViewings = () =>
+  apiEnabled ? apiOrThrow('/viewings').then((d) => d.viewings) : demoGetMyViewings()
+
+export async function cancelViewing(reference) {
+  if (!apiEnabled) return demoCancelViewing(reference)
+  await apiOrThrow(`/viewings/${reference}/cancel`, { method: 'PATCH' })
+  return getMyViewings()
 }

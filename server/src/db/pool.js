@@ -1,6 +1,11 @@
 import pg from 'pg'
 import { config } from '../config.js'
 
+// Dates come back as plain "2026-10-05" text (not shifted by timezones) and
+// money columns as real numbers instead of text.
+pg.types.setTypeParser(1082, (value) => value)
+pg.types.setTypeParser(1700, (value) => parseFloat(value))
+
 // One shared pool of database connections for the whole server.
 export const pool = new pg.Pool({
   connectionString: config.databaseUrl,

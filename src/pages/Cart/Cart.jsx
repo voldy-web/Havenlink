@@ -5,6 +5,8 @@ import Button from '../../components/ui/Button'
 import ProductImage from '../../components/ui/ProductImage'
 import PaymentForm from '../../components/ui/PaymentForm'
 import { useCart } from '../../hooks/useCart'
+import { useAuth } from '../../hooks/useAuth'
+import { apiEnabled } from '../../services/api'
 import { getProductsByIds } from '../../services/productService'
 import { createOrder, deliveryFee, FREE_DELIVERY_OVER } from '../../services/orderService'
 import { emptyPayment, validatePayment, paymentLabel } from '../../utils/payment'
@@ -28,6 +30,9 @@ function deliveryDays() {
 
 export default function Cart() {
   const { lines, subtotal, setQty, removeItem, clear } = useCart()
+  const { user } = useAuth()
+  // With the real API an order belongs to an account, so checkout needs a sign-in.
+  const needsSignIn = apiEnabled && !user
   const [products, setProducts] = useState({})
   const [address, setAddress] = useState(emptyAddress)
   const [days] = useState(deliveryDays)
@@ -78,7 +83,9 @@ export default function Cart() {
     // DEMO: pretend the payment takes a moment. A real payment provider
     // will be connected with the backend.
     await new Promise((resolve) => setTimeout(resolve, 1200))
-    const saved = await createOrder({
+    let saved
+    try {
+      saved = await createOrder({
       items: lines.map((l) => ({
         productId: l.productId,
         name: products[l.productId]?.name || 'Item',
@@ -95,7 +102,12 @@ export default function Cart() {
       // Only the method is kept. Card and phone details are never stored.
       paymentMethod: paymentLabel(payment),
       paid: payment.method !== 'cash',
-    })
+      })
+    } catch (err) {
+      setPlacing(false)
+      setErrors({ form: err.message })
+      return
+    }
     clear()
     setPlacing(false)
     setOrder(saved)
@@ -272,10 +284,18 @@ export default function Cart() {
               <div><b>Order Total</b><small>Delivery included</small></div>
               <strong>{formatPrice(total)}</strong>
             </div>
+            {errors.form && <p className="cart__error" role="alert">{errors.form}</p>}
+            {needsSignIn ? (
+              <>
+                <p className="cart__hint">Sign in to place your order. Your cart will be waiting.</p>
+                <Link to="/login?next=/cart" className="cart__place cart__place--link">Sign in to order</Link>
+              </>
+            ) : (
             <button type="submit" className="cart__place" disabled={placing}>
               <Icon name="lock" size={16} />
               {placing ? 'Placing order…' : payment.method === 'cash' ? `Place Order (${formatPrice(total)} on delivery)` : `Pay ${formatPrice(total)} & Place Order`}
             </button>
+            )}
             <p className="cart__terms">By ordering you agree to Haven Link's Terms of Service.</p>
           </section>
         </aside>

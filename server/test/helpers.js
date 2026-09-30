@@ -4,6 +4,7 @@ process.env.DATABASE_URL = process.env.TEST_DATABASE_URL || 'postgres://havenlin
 process.env.JWT_SECRET = 'test-secret-that-is-long-enough-for-the-server-to-start'
 process.env.CLIENT_ORIGIN = 'http://localhost:5173'
 process.env.AUTH_RATE_LIMIT = '1000'
+process.env.DEMO_TOOLS = 'true'
 
 const { createApp } = await import('../src/app.js')
 const { pool } = await import('../src/db/pool.js')
@@ -46,3 +47,14 @@ export async function call(base, path, { method = 'GET', body, token, headers = 
   try { json = JSON.parse(text) } catch { /* not JSON */ }
   return { status: res.status, body: json, headers: res.headers }
 }
+
+// Creates an account through the real sign-up route. Returns { token, user }.
+let counter = 0
+export async function signUp(base, over = {}) {
+  counter += 1
+  const r = await call(base, '/api/auth/register', { method: 'POST', body: person({ email: `user${counter}-${Date.now()}@example.com`, ...over }) })
+  if (r.status !== 201) throw new Error(`sign-up failed: ${JSON.stringify(r.body)}`)
+  return r.body
+}
+
+export const tomorrow = () => new Date(Date.now() + 24 * 3600 * 1000).toISOString().slice(0, 10)

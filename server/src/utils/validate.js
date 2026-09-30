@@ -31,3 +31,18 @@ export function checkRole(v) {
 }
 
 export const clean = { text, email: (v) => text(v).toLowerCase() }
+
+// ---- Generic checks used by the account-data routes ----
+export const isInt = (v, min, max) => Number.isInteger(v) && v >= min && v <= max
+export const isMoney = (v, max) => typeof v === 'number' && Number.isFinite(v) && v >= 0 && v <= max
+export const isText = (v, min, max) => typeof v === 'string' && v.trim().length >= min && v.trim().length <= max
+
+// A real calendar date written as YYYY-MM-DD.
+export function isDateString(v) {
+  if (typeof v !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(v)) return false
+  const d = new Date(`${v}T00:00:00Z`)
+  return !Number.isNaN(d.getTime()) && d.toISOString().slice(0, 10) === v
+}
+
+// Today's date (UTC) as YYYY-MM-DD, with a day of slack for time zones.
+export const yesterday = () => new Date(Date.now() - 24 * 3600 * 1000).toISOString().slice(0, 10)

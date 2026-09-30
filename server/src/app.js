@@ -5,6 +5,11 @@ import { config } from './config.js'
 import { HttpError } from './utils/errors.js'
 import health from './routes/health.js'
 import auth from './routes/auth.js'
+import saved from './routes/saved.js'
+import viewings from './routes/viewings.js'
+import reports from './routes/reports.js'
+import orders from './routes/orders.js'
+import serviceRequests from './routes/serviceRequests.js'
 
 // The Express app (kept separate from index.js so tests can start it).
 export function createApp() {
@@ -20,10 +25,17 @@ export function createApp() {
       done(null, !origin || config.clientOrigins.includes(origin))
     },
   }))
+
+  // Reports accept photos, so they read their own (bigger) request body first.
+  app.use('/api/reports', reports)
   app.use(express.json({ limit: '100kb' }))
 
   app.use('/api/health', health)
   app.use('/api/auth', auth)
+  app.use('/api/saved', saved)
+  app.use('/api/viewings', viewings)
+  app.use('/api/orders', orders)
+  app.use('/api/service-requests', serviceRequests)
 
   app.use('/api', (_req, _res, next) => next(new HttpError(404, 'Not found.')))
 

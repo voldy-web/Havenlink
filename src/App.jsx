@@ -16,6 +16,7 @@ import SavedHomes from './pages/SavedHomes/SavedHomes'
 import ReportProblem from './pages/ReportProblem/ReportProblem'
 import MyReports from './pages/MyReports/MyReports'
 import Auth from './pages/Auth/Auth'
+import RequireAuth from './components/RequireAuth'
 import Orders from './pages/Orders/Orders'
 import Viewings from './pages/Viewings/Viewings'
 import ComingSoon from './pages/ComingSoon/ComingSoon'
@@ -31,10 +32,10 @@ export default function App() {
         <Route path="/properties" element={<Properties />} />
         <Route path="/properties/new" element={<ComingSoon title="Post a Property" />} />
         <Route path="/properties/:id" element={<PropertyDetail />} />
-        <Route path="/properties/:id/book" element={<BookViewing />} />
+        <Route path="/properties/:id/book" element={<RequireAuth><BookViewing /></RequireAuth>} />
         <Route path="/services" element={<Services />} />
         <Route path="/services/:id" element={<ProviderProfile />} />
-        <Route path="/services/:id/pay" element={<ProviderPay />} />
+        <Route path="/services/:id/pay" element={<RequireAuth><ProviderPay /></RequireAuth>} />
         <Route path="/shop" element={<Shop />} />
         <Route path="/shop/:id" element={<ProductDetail />} />
         <Route path="/cart" element={<Cart />} />

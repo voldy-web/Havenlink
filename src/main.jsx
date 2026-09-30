@@ -13,11 +13,11 @@ createRoot(document.getElementById('root')).render(
     <BrowserRouter>
       {/* CartProvider keeps the shopping cart available on every page. */}
       <CartProvider>
-        <SavedProvider>
-          <AuthProvider>
+        <AuthProvider>
+          <SavedProvider>
             <App />
-          </AuthProvider>
-        </SavedProvider>
+          </SavedProvider>
+        </AuthProvider>
       </CartProvider>
     </BrowserRouter>
   </StrictMode>,

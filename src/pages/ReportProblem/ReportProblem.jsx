@@ -47,10 +47,15 @@ export default function ReportProblem() {
     }
     setSending(true)
     try { localStorage.setItem(LAST_HOME_KEY, form.home.trim()) } catch { /* storage blocked: fine */ }
-    const report = await createReport({ ...form, home: form.home.trim(), summary: form.summary.trim(), description: form.description.trim(), photos })
-    setSending(false)
-    setDone(report)
-    window.scrollTo(0, 0)
+    try {
+      const report = await createReport({ ...form, home: form.home.trim(), summary: form.summary.trim(), description: form.description.trim(), photos })
+      setDone(report)
+      window.scrollTo(0, 0)
+    } catch (err) {
+      setErrors({ form: err.message })
+    } finally {
+      setSending(false)
+    }
   }
 
   if (done) {
@@ -145,6 +150,7 @@ export default function ReportProblem() {
         </div>
       </section>
 
+      {errors.form && <p className="rp-error" role="alert">{errors.form}</p>}
       <button type="submit" className="rp__submit" disabled={sending}>
         <Icon name="shield" size={16} /> {sending ? 'Sending…' : 'Submit Report'}
       </button>

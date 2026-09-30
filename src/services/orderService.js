@@ -1,6 +1,7 @@
 // Orders. Today they are saved in the browser (localStorage); when the
 // backend exists these functions will call the API instead. Card and phone
 // payment details are never stored, only the payment method.
+import { apiEnabled, apiOrThrow } from './api'
 const ORDERS_KEY = 'havenlink_orders'
 
 // Delivery charge rules (mock). Free above the threshold.
@@ -25,7 +26,7 @@ function readAll() {
   }
 }
 
-export async function createOrder(details) {
+async function demoCreateOrder(details) {
   const order = {
     ...details,
     reference: `HL-O-${Date.now().toString().slice(-6)}`,
@@ -41,12 +42,12 @@ export async function createOrder(details) {
   return order
 }
 
-export async function getMyOrders() {
+async function demoGetMyOrders() {
   return readAll()
 }
 
 // DEMO ONLY: moves an order to its next stage (the vendor side is not built yet).
-export async function advanceOrder(reference) {
+async function demoAdvanceOrder(reference) {
   const order = orderStages.map((s) => s.id)
   const orders = readAll().map((o) => {
     if (o.reference !== reference) return o
@@ -60,4 +61,17 @@ export async function advanceOrder(reference) {
     // Storage blocked: the change is not saved.
   }
   return orders
+}
+
+// ---- What the pages use: the real API when connected, otherwise the browser demo ----
+export const createOrder = (details) =>
+  apiEnabled ? apiOrThrow('/orders', { method: 'POST', body: details }).then((d) => d.order) : demoCreateOrder(details)
+
+export const getMyOrders = () =>
+  apiEnabled ? apiOrThrow('/orders').then((d) => d.orders) : demoGetMyOrders()
+
+export async function advanceOrder(reference) {
+  if (!apiEnabled) return demoAdvanceOrder(reference)
+  await apiOrThrow(`/orders/${reference}/advance`, { method: 'PATCH' })
+  return getMyOrders()
 }

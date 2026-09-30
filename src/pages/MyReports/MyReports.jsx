@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import Icon from '../../components/ui/Icon'
 import Button from '../../components/ui/Button'
 import { getMyReports, advanceReport } from '../../services/reportService'
+import { demoTools } from '../../services/api'
 import { reportStages, reportCategories, urgencies } from '../../data/reportOptions'
 import './MyReports.css'
 
@@ -89,7 +90,7 @@ export default function MyReports() {
                   </div>
                 )}
 
-                {r.status !== 'Resolved' && (
+                {demoTools && r.status !== 'Resolved' && (
                   <button className="rcard__demo" onClick={async () => setReports(await advanceReport(r.reference))}>
                     Demo: move to next stage
                   </button>
