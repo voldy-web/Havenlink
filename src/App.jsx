@@ -1,122 +1,44 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+import { Routes, Route } from 'react-router-dom'
+import SiteLayout from './components/layout/SiteLayout'
+import Home from './pages/Home/Home'
+import Properties from './pages/Properties/Properties'
+import PropertyDetail from './pages/PropertyDetail/PropertyDetail'
+import BookViewing from './pages/BookViewing/BookViewing'
+import Services from './pages/Services/Services'
+import ProviderProfile from './pages/ProviderProfile/ProviderProfile'
+import ProviderPay from './pages/ProviderPay/ProviderPay'
+import Shop from './pages/Shop/Shop'
+import ProductDetail from './pages/ProductDetail/ProductDetail'
+import Cart from './pages/Cart/Cart'
+import ComingSoon from './pages/ComingSoon/ComingSoon'
+import NotFound from './pages/NotFound/NotFound'
 
-function App() {
-  const [count, setCount] = useState(0)
-
+// The route table: which URL shows which page.
+// Pages not built yet use <ComingSoon /> until their step comes up.
+export default function App() {
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+    <Routes>
+      <Route element={<SiteLayout />}>
+        <Route path="/" element={<Home />} />
+        <Route path="/properties" element={<Properties />} />
+        <Route path="/properties/new" element={<ComingSoon title="Post a Property" />} />
+        <Route path="/properties/:id" element={<PropertyDetail />} />
+        <Route path="/properties/:id/book" element={<BookViewing />} />
+        <Route path="/messages" element={<ComingSoon title="Messages" />} />
+        <Route path="/services" element={<Services />} />
+        <Route path="/services/:id" element={<ProviderProfile />} />
+        <Route path="/services/:id/pay" element={<ProviderPay />} />
+        <Route path="/shop" element={<Shop />} />
+        <Route path="/shop/:id" element={<ProductDetail />} />
+        <Route path="/cart" element={<Cart />} />
+        <Route path="/orders" element={<ComingSoon title="My Orders" />} />
+        <Route path="/login" element={<ComingSoon title="Log In" />} />
+        <Route path="/dashboard" element={<ComingSoon title="Dashboard" />} />
+        <Route path="/help" element={<ComingSoon title="Help Center" />} />
+        <Route path="/terms" element={<ComingSoon title="Terms of Service" />} />
+        <Route path="/privacy" element={<ComingSoon title="Privacy Statement" />} />
+        <Route path="*" element={<NotFound />} />
+      </Route>
+    </Routes>
   )
 }
-
-export default App

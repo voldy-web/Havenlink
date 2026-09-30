@@ -1,0 +1,88 @@
+.provider-card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+}
+.provider-card__body { flex: 1; padding: var(--space-4); }
+
+.provider-card header { display: flex; align-items: flex-start; gap: var(--space-3); }
+.provider-card header > div { flex: 1; min-width: 0; }
+.provider-card h3 { font-size: 17px; }
+.provider-card h3 a:hover { color: var(--color-primary); }
+.provider-card header p { margin: 2px 0 0; font-size: 12px; }
+
+.provider-card__avatar {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.provider-card__rate { font-size: 18px; color: var(--color-navy); white-space: nowrap; }
+.provider-card__rate small { font-size: 12px; font-weight: 500; color: var(--color-text); }
+
+.provider-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin: var(--space-3) 0;
+  font-size: 12px;
+}
+.provider-card__meta span { display: inline-flex; align-items: center; gap: 4px; }
+.provider-card__meta svg { color: var(--color-primary); }
+.provider-card__meta span:first-child svg { color: var(--color-star); fill: currentColor; }
+
+.provider-card__badges { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 var(--space-3); padding: 0; list-style: none; }
+.provider-card__badges li {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+  background: var(--color-chip);
+  color: var(--color-navy);
+  font-size: 11px;
+  font-weight: 700;
+}
+.provider-card__badges li.is-main { background: var(--color-primary-soft); color: var(--color-primary); }
+
+.provider-card__blurb {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin: 0;
+  font-size: 13px;
+}
+
+.provider-card footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-bg-alt);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-text);
+}
+.provider-card footer .is-now { color: var(--color-primary); }
+.provider-card__cta {
+  padding: 8px 14px;
+  border-radius: var(--radius-pill);
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+}
+.provider-card__cta:hover { background: var(--color-primary-dark); }

@@ -22,3 +22,9 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Environment files hold secrets - never commit them.
+# .env.example (blank values) is the only one we track.
+.env
+.env.*
+!.env.example

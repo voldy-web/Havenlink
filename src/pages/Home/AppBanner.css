@@ -1,0 +1,35 @@
+.app-banner {
+  margin-top: var(--space-7);
+  padding: var(--space-6);
+  border-radius: var(--radius-lg);
+  background: var(--color-primary);
+  color: #fff;
+}
+.app-banner h2 {
+  margin: var(--space-3) 0;
+  font-size: clamp(26px, 4vw, 34px);
+  color: #fff;
+}
+.app-banner p { max-width: 460px; margin: 0 0 var(--space-4); color: #d9efe9; }
+
+.app-banner__tag {
+  display: inline-block;
+  padding: 3px 12px;
+  border-radius: var(--radius-pill);
+  background: var(--color-mint);
+  color: var(--color-primary);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.app-banner__stores { display: flex; flex-wrap: wrap; gap: var(--space-3); }
+.app-banner__stores button {
+  padding: 8px 18px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: #fff;
+  color: var(--color-navy);
+  font-weight: 700;
+  opacity: 0.85;
+  cursor: not-allowed;
+}

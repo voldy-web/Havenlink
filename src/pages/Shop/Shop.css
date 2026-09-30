@@ -1,0 +1,80 @@
+.shop { padding-top: var(--space-6); }
+.shop__head h1 { font-size: clamp(28px, 4.5vw, 40px); }
+.shop__head p:last-child { max-width: 620px; margin: var(--space-2) 0 0; }
+
+.shop__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3) var(--space-4);
+  margin: var(--space-5) 0;
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+}
+.shop__bar strong { font-size: 22px; color: var(--color-navy); }
+.shop__bar strong span { font-size: 14px; font-weight: 500; color: var(--color-text); }
+.shop__chips { flex: 1; display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.shop__chips button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.shop__chips .shop__clear { background: none; text-decoration: underline; }
+.shop__bar .sort { padding: 0; background: none; }
+
+.shop__layout {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: var(--space-5);
+  align-items: start;
+}
+.shop__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--space-5);
+}
+
+.material-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.material-chips button {
+  padding: 5px 12px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--color-chip);
+  color: var(--color-navy);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.material-chips button.is-active { background: var(--color-primary); color: #fff; }
+
+.shop__banner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-4);
+  margin-top: var(--space-7);
+  padding: var(--space-5);
+  border-radius: var(--radius-md);
+  background: var(--color-primary-soft);
+}
+.shop__banner > span { display: grid; place-items: center; width: 52px; height: 52px; border-radius: var(--radius-md); background: var(--color-primary); color: #fff; }
+.shop__banner > div { flex: 1; min-width: 240px; }
+.shop__banner h2 { font-size: 20px; }
+.shop__banner p { margin: 4px 0 0; font-size: 14px; }
+.shop__banner-link { padding: 10px 22px; border-radius: var(--radius-pill); background: var(--color-primary); color: #fff; font-size: 13px; font-weight: 700; }
+
+@media (max-width: 900px) {
+  .shop__layout { grid-template-columns: 1fr; }
+}

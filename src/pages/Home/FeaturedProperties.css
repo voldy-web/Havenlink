@@ -1,0 +1,52 @@
+.featured { padding-top: var(--space-7); }
+
+.eyebrow {
+  margin: 0 0 var(--space-1);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-primary);
+}
+
+.featured__head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
+}
+.featured__head h2 { font-size: clamp(24px, 4vw, 32px); max-width: 420px; }
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+.chips button {
+  padding: 6px 14px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--color-chip);
+  color: var(--color-navy);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.chips button.is-active {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.featured__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--space-5);
+}
+.featured__empty { text-align: center; }
+
+.featured__more {
+  margin-top: var(--space-6);
+  text-align: center;
+}

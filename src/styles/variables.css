@@ -1,0 +1,55 @@
+/* ==========================================================
+   Haven Link design tokens
+   Every color, font and spacing value lives HERE, so changing
+   the look of the whole site means editing this one file.
+   Values were sampled from the design PDF - when Figma access
+   is available, verify them against the Figma variables.
+   ========================================================== */
+:root {
+  /* Brand greens */
+  --color-primary: #006858;        /* buttons, links, key headings */
+  --color-primary-dark: #00503f;   /* hover state */
+  --color-primary-soft: #d9efe9;   /* tinted backgrounds, active nav item */
+  --color-mint: #94f2d8;           /* small badges ("Available", "Verified") */
+
+  /* Text */
+  --color-navy: #0a1a3a;           /* headings */
+  --color-text: #56605f;           /* body text */
+  --color-text-light: #7e888f;     /* captions, placeholders */
+
+  /* Surfaces */
+  --color-bg: #faf8ff;             /* page background */
+  --color-bg-alt: #f1f3ff;         /* alternating sections, hero */
+  --color-surface: #ffffff;        /* cards, navbar */
+  --color-chip: #e6eaf7;           /* filter chips */
+  --color-border: #e0e4f0;
+
+  /* Status colors (property status, report status, etc.) */
+  --color-warning: #d97706;
+  --color-danger: #c62828;
+  --color-star: #f5a623;
+
+  /* Fonts (loaded from Google Fonts in index.html) */
+  --font-main: 'Plus Jakarta Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  /* Spacing scale */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 72px;
+
+  /* Shape and shadow */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-pill: 999px;
+  --shadow-card: 0 4px 20px rgba(10, 26, 58, 0.06);
+
+  /* Layout */
+  --page-width: 1200px;
+  --navbar-height: 64px;
+}
