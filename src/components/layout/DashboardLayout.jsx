@@ -17,8 +17,10 @@ const links = [
 ]
 
 export default function DashboardLayout() {
-  const { user, logout } = useAuth()
+  const { user, loading, logout } = useAuth()
   const { pathname, search } = useLocation()
+
+  if (loading) return <p className="container dash">Loading…</p>
 
   // Signed-out visitors go to the login page, then come straight back here.
   if (!user) return <Navigate to={`/login?next=${encodeURIComponent(pathname + search)}`} replace />

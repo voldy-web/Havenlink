@@ -17,7 +17,7 @@ const points = [
 
 export default function Auth({ mode }) {
   const isRegister = mode === 'register'
-  const { user, login, register } = useAuth()
+  const { user, loading, demo, login, register } = useAuth()
   const navigate = useNavigate()
   const [params] = useSearchParams()
   const next = safeNext(params.get('next'))
@@ -26,6 +26,7 @@ export default function Auth({ mode }) {
   const [busy, setBusy] = useState(false)
   const set = (patch) => setForm((f) => ({ ...f, ...patch }))
 
+  if (loading) return null
   if (user) return <Navigate to={next} replace />
 
   async function submit(e) {
@@ -40,9 +41,9 @@ export default function Auth({ mode }) {
     if (Object.keys(found).length) return
 
     setBusy(true)
-    const result = isRegister ? await register(form) : await login(form.email)
+    const result = isRegister ? await register(form) : await login(form.email, form.password)
     setBusy(false)
-    if (result.error) return setErrors({ form: result.error })
+    if (result.error) return setErrors({ form: result.error, ...result.fields })
     navigate(next, { replace: true })
   }
 
@@ -67,8 +68,8 @@ export default function Auth({ mode }) {
           <Link role="tab" aria-selected={!isRegister} className={!isRegister ? 'is-active' : ''} to={`/login${next === '/dashboard' ? '' : `?next=${encodeURIComponent(next)}`}`}>Sign In</Link>
         </div>
 
-        <p className="auth__demo"><Icon name="shield" size={14} /> Demo mode: accounts are kept in this browser only and passwords are not saved. Real accounts arrive with the backend.</p>
-        {errors.form && <p className="auth__error" role="alert">{errors.form} <Link to={otherLink}>{isRegister ? 'Sign in' : 'Create account'}</Link></p>}
+        {demo && <p className="auth__demo"><Icon name="shield" size={14} /> Demo mode: accounts are kept in this browser only and passwords are not saved. Real accounts arrive with the backend.</p>}
+        {errors.form && <p className="auth__error" role="alert">{errors.form}{!errors.form.startsWith('Cannot reach') && <> <Link to={otherLink}>{isRegister ? 'Sign in' : 'Create account'}</Link></>}</p>}
 
         {isRegister && (
           <fieldset className="auth__roles">

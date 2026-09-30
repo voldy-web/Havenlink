@@ -18,4 +18,9 @@ export default defineConfig([
       parserOptions: { ecmaFeatures: { jsx: true } },
     },
   },
+  {
+    // The backend runs on Node, not in a browser.
+    files: ['server/**/*.js'],
+    languageOptions: { globals: globals.node },
+  },
 ])
