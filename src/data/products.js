@@ -1,5 +1,6 @@
 import { photo } from './photos'
 import { moreProducts } from './productCatalog'
+import { applianceProducts } from './applianceCatalog'
 
 // Mock shop products. Later these come from the backend
 // (see src/services/productService.js).
@@ -132,4 +133,4 @@ const baseProducts = [
 ]
 
 // The first 12 are hand-written with photos; the rest are generated (see productCatalog.js).
-export const products = [...baseProducts, ...moreProducts]
+export const products = [...baseProducts, ...moreProducts, ...applianceProducts]

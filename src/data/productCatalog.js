@@ -3,6 +3,7 @@
 // Row: [name, category, vendor, material, price, oldPrice (0 = none), rating,
 //       reviews, feature, dims, power, warranty]
 import { photo } from './photos'
+import { existingPhotoFor, applianceFile } from './applianceCatalog'
 
 const rows = [
   // ---- Small appliances ----
@@ -94,7 +95,8 @@ export const moreProducts = rows.map(([name, category, vendor, material, price, 
     delivery: price >= 3000 ? 'Free delivery' : 'Standard delivery',
     stock,
     // Drop a photo named product-<id>.jpg into src/assets/photos/ to replace the illustration.
-    image: photo(`product-${id}`),
+    image: photo(`product-${id}`) ?? (existingPhotoFor[id] ? photo(applianceFile(existingPhotoFor[id])) : undefined),
+    cutout: !photo(`product-${id}`) && !!existingPhotoFor[id] && !!photo(applianceFile(existingPhotoFor[id])),
     description: `${feature}. ${intro[category]}`,
     specs,
   }

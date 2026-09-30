@@ -9,7 +9,8 @@ const icons = { beds: 'bed', couches: 'home', appliances: 'washer', small: 'bolt
 // To use a real photo, save it as src/assets/photos/product-<id>.jpg.
 export default function ProductImage({ product, src, alt, loading = 'lazy' }) {
   const url = src ?? product.image
-  if (url) return <img src={url} alt={alt ?? product.name} loading={loading} />
+  // Cut-out appliance photos sit on white, so they are shown whole (not cropped).
+  if (url) return <img src={url} alt={alt ?? product.name} loading={loading} className={product.cutout ? 'is-cutout' : undefined} />
   const label = categories.find((c) => c.id === product.category)?.label
   return (
     <div className={`product-art product-art--${product.category}`} role="img" aria-label={`${product.name} (photo coming soon)`}>
