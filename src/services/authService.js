@@ -2,7 +2,7 @@
 //  - API mode (VITE_API_URL is set): real accounts on the backend.
 //  - Demo mode: accounts live in this browser (localStorage). Passwords are
 //    checked for length but NEVER stored there.
-import { api, apiEnabled, setToken, getToken } from './api'
+import { api, apiEnabled, apiOrThrow, setToken, getToken } from './api'
 
 const ACCOUNTS_KEY = 'havenlink_accounts'
 const SESSION_KEY = 'havenlink_session'
@@ -86,3 +86,47 @@ export function signOut() {
 }
 
 export const isDemoAuth = !apiEnabled
+
+// ---- Profile & settings ----
+export const defaultPrivacy = { maskContact: true, anonymousReviews: false, residentDirectory: false }
+
+// Saves name, phone, emergency contact and privacy choices. Returns the updated user.
+export async function updateProfile(details) {
+  if (apiEnabled) return (await apiOrThrow('/account/profile', { method: 'PATCH', body: details })).user
+  // Demo mode: update this browser's copy of the account (never email or role).
+  const email = read(SESSION_KEY, null)
+  const accounts = read(ACCOUNTS_KEY, [])
+  const account = { ...accounts.find((a) => a.email === email), ...details }
+  localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(accounts.map((a) => (a.email === email ? account : a))))
+  return account
+}
+
+// Real accounts only. The server signs out older logins and returns a fresh token.
+export async function changePassword(currentPassword, newPassword) {
+  const data = await apiOrThrow('/account/password', { method: 'POST', body: { currentPassword, newPassword } })
+  setToken(data.token)
+  return data.user
+}
+
+// Downloads everything we hold about the account as a JSON file.
+export async function exportMyData(user) {
+  const data = apiEnabled ? await apiOrThrow('/account/export') : { exportedAt: new Date().toISOString(), account: user, note: 'Demo mode: data is kept in this browser only.' }
+  const url = URL.createObjectURL(new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }))
+  const link = Object.assign(document.createElement('a'), { href: url, download: 'havenlink-my-data.json' })
+  document.body.append(link)
+  link.click()
+  link.remove()
+  URL.revokeObjectURL(url)
+}
+
+// Permanently deletes the account (real accounts need the password).
+export async function deleteAccount(password) {
+  if (apiEnabled) {
+    await apiOrThrow('/account/delete', { method: 'POST', body: { password } })
+    setToken(null)
+    return
+  }
+  const email = read(SESSION_KEY, null)
+  localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(read(ACCOUNTS_KEY, []).filter((a) => a.email !== email)))
+  demoSignOut()
+}

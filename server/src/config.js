@@ -27,6 +27,8 @@ export const config = {
   clientOrigins: (env.CLIENT_ORIGIN || 'http://localhost:5173').split(',').map((o) => o.trim()).filter(Boolean),
   // Sign-up and sign-in attempts allowed per IP address per 15 minutes.
   authRateLimit: Number(env.AUTH_RATE_LIMIT) || 20,
+  // Messages a person may send per IP address per minute.
+  messageRateLimit: Number(env.MESSAGE_RATE_LIMIT) || 60,
   // TESTING ONLY: lets a person move their own report/order to the next stage,
   // because the owner and vendor sides are not built yet. Keep off for real use.
   demoTools: env.DEMO_TOOLS === 'true',

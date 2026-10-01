@@ -15,8 +15,7 @@ Tips
 Names in use: property-*, detail-*, shop-*, sofa-*, work-*, home-* (see src/assets/mock/).
 
 ## Appliance photos
-`appliance-001.jpg` ... `appliance-100.jpg` are the appliance pictures from the "100 Home
-Appliances" sheet (the number is the picture number on that sheet, see
-`src/data/applianceCatalog.js`). Some numbers are missing on purpose: those source
-pictures were cut off, so the shop shows the illustration tile instead. To fill a gap, save
-a good photo with that exact name, for example `appliance-070.jpg` (4:3, about 1200x900).
+`appliance-NNN.jpg` are kitchen-style appliance photos. NNN is the picture number in
+`src/data/applianceCatalog.js`. Only the numbers listed in `lifestylePics` there are shown;
+any other product shows the "Photo coming soon" tile. To add a photo: save it as
+`appliance-NNN.jpg` (about 1200 px wide) and add NNN to `lifestylePics`.

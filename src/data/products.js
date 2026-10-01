@@ -133,4 +133,5 @@ const baseProducts = [
 ]
 
 // The first 12 are hand-written with photos; the rest are generated (see productCatalog.js).
-export const products = [...baseProducts, ...moreProducts, ...applianceProducts]
+// Only products that have a photo are listed in the shop. A product appears as soon as its photo is added.
+export const products = [...baseProducts, ...moreProducts, ...applianceProducts].filter((p) => p.image)

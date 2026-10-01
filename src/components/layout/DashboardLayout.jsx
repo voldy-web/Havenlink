@@ -2,6 +2,7 @@ import { Navigate, NavLink, Outlet, useLocation } from 'react-router-dom'
 import Icon from '../ui/Icon'
 import Button from '../ui/Button'
 import { useAuth } from '../../hooks/useAuth'
+import { useUnreadMessages } from '../../hooks/useUnreadMessages'
 import { roles } from '../../data/roles'
 import './DashboardLayout.css'
 
@@ -14,11 +15,14 @@ const links = [
   { to: '/viewings', label: 'Viewings', icon: 'calendar' },
   { to: '/orders', label: 'Orders', icon: 'truck' },
   { to: '/messages', label: 'Messages', icon: 'chat' },
+  { to: '/payments', label: 'Payments', icon: 'card' },
+  { to: '/settings', label: 'Settings', icon: 'user' },
 ]
 
 export default function DashboardLayout() {
   const { user, loading, logout } = useAuth()
   const { pathname, search } = useLocation()
+  const unread = useUnreadMessages()
 
   if (loading) return <p className="container dash">Loading…</p>
 
@@ -46,6 +50,7 @@ export default function DashboardLayout() {
         {links.map((l) => (
           <NavLink key={l.to} to={l.to} end={l.end}>
             <Icon name={l.icon} size={17} /> {l.label}
+            {l.to === '/messages' && unread > 0 && <i className="msg__nav-badge" aria-label={`${unread} unread messages`}>{unread}</i>}
           </NavLink>
         ))}
       </nav>

@@ -35,6 +35,8 @@ export default function ShopFilters({ filters, categoryCounts, onApply, onReset 
         <legend>Categories</legend>
         {categories.map((c) => {
           const count = categoryCounts[c.id] || 0
+          // Hide a category with no products (unless it is already ticked, so it can be unticked).
+          if (!count && !draft.categories.includes(c.id)) return null
           return (
             <label key={c.id} className="check">
               <input

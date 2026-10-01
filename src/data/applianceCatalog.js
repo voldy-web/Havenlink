@@ -1,6 +1,6 @@
 // The 100 home appliances from the "100 Home Appliances" picture sheet.
 // Row: [picture number, name, category, price in GH₵]. Prices are mock data.
-// The sharpened pictures are src/assets/photos/appliance-001.jpg ... appliance-100.jpg.
+// The sharpened pictures are src/assets/photos/appliance-001.jpg ... appliance-109.jpg.
 import { photo } from './photos'
 
 const pics = [
@@ -104,6 +104,15 @@ const pics = [
   [98, "Electric fondue pot", 'small', 280],
   [99, "Electric tabletop grill", 'small', 300],
   [100, "Electric lunch box/food warmer", 'small', 260],
+  [101, "Milk frother and warmer", 'small', 320],
+  [102, "Vacuum sealer", 'small', 480],
+  [103, "Range hood", 'appliances', 2200],
+  [104, "Coffee grinder", 'small', 520],
+  [105, "Bean-to-cup coffee machine", 'appliances', 4200],
+  [106, "Sous vide cooker", 'small', 650],
+  [107, "Countertop smart oven", 'small', 1800],
+  [108, "Toaster oven", 'small', 950],
+  [109, "Knife sharpener", 'small', 280],
 ]
 
 // Products already in productCatalog.js that are the same item as a picture.
@@ -115,7 +124,18 @@ export const existingPhotoFor = {
 }
 const taken = new Set(Object.values(existingPhotoFor))
 
+// Pictures that are styled kitchen photos (not a product on plain white).
+// They fill the card like the other shop photos; the white cut-outs are shown whole.
+export const lifestylePics = new Set([
+  2, 5, 6, 7, 8, 9, 10, 11, 13, 15, 16, 18, 20, 22, 23, 25, 26, 27, 28, 30, 31, 32, 33, 36, 39, 40, 43,
+  96, 97, 98, 99, 101, 102, 103, 104, 105, 106, 107, 108, 109,
+])
+
 export const applianceFile = (n) => `appliance-${String(n).padStart(3, '0')}`
+
+// Only the kitchen-style photos are used. Any other appliance-NNN file is ignored,
+// so a product without one shows the "Photo coming soon" tile.
+export const appliancePhoto = (n) => (lifestylePics.has(n) ? photo(applianceFile(n)) : undefined)
 
 const brands = ['Bosch Home', 'Accra Home Hub', 'Kumasi Electricals', 'Nordic Living Co', 'Haven Living', 'Sahara Home Supplies']
 const badges = ['Best Value', 'New Arrival', 'Top Rated', 'Popular Pick', 'Great Deal', 'Energy Saver']
@@ -135,8 +155,7 @@ export const applianceProducts = pics
       dims: 'See specification', feature: `${name} for everyday home use`,
       delivery: price >= 3000 ? 'Free delivery' : 'Standard delivery',
       stock: i % 13 === 4 ? 0 : 4 + ((n * 5) % 30),
-      image: photo(applianceFile(n)),
-      cutout: true,
+      image: appliancePhoto(n),
       description: `A dependable ${name.toLowerCase()}. ${large ? 'Delivered and set up for you.' : 'A useful everyday appliance for a busy home.'}`,
       specs: [['Brand', vendor], ['Type', name], ['Warranty', large ? '2 years' : '1 year']],
     }

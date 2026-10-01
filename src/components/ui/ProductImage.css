@@ -6,5 +6,3 @@
 .product-art--kitchen { background: linear-gradient(135deg, #fbefdc, #eef6ef); }
 .product-art--decor { background: linear-gradient(135deg, #f3e8f7, #eaf3f0); }
 
-/* Appliance cut-outs: show the whole product on white instead of cropping it. */
-img.is-cutout { object-fit: contain !important; background: #fff; padding: 6px; }

@@ -242,7 +242,7 @@ export default function PropertyDetail() {
                 <div><dt>Reviews</dt><dd><Icon name="star" size={12} /> {agent.rating} ({agent.reviews})</dd></div>
               </dl>
               <div className="agent__buttons">
-                <Link to="/messages"><Icon name="chat" size={16} /> Chat with {agent.name.split(' ')[0]}</Link>
+                <Link to={`/messages/new?property=${property.id}`}><Icon name="chat" size={16} /> Chat with {agent.name.split(' ')[0]}</Link>
                 <a href={`tel:${agent.phone}`}><Icon name="phone" size={16} /> Direct Call</a>
               </div>
             </section>

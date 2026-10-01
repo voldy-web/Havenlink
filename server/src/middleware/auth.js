@@ -8,6 +8,7 @@ export const signToken = (user) => jwt.sign({ sub: user.id, role: user.role }, c
 // The shape of a user we send to the browser. NEVER includes the password hash.
 export const publicUser = (row) => ({
   id: row.id, name: row.name, email: row.email, phone: row.phone, role: row.role, createdAt: row.created_at,
+  emergencyName: row.emergency_name, emergencyPhone: row.emergency_phone, privacy: row.privacy,
 })
 
 // Protects a route: needs "Authorization: Bearer <token>". Puts the user on req.user.
@@ -23,6 +24,10 @@ export async function requireAuth(req, _res, next) {
   }
   const { rows } = await pool.query('select * from users where id = $1', [payload.sub])
   if (!rows[0]) throw new HttpError(401, 'Please sign in.')
+  // A password change signs out every older login (tokens store when they were issued).
+  if (payload.iat < Math.floor(new Date(rows[0].password_changed_at).getTime() / 1000)) {
+    throw new HttpError(401, 'Your session has expired. Please sign in again.')
+  }
   req.user = rows[0]
   next()
 }

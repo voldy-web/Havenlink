@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { AuthContext } from './AuthContext'
-import { loadSession, registerAccount, signIn, signOut } from '../services/authService'
+import { loadSession, registerAccount, signIn, signOut, updateProfile, changePassword, deleteAccount } from '../services/authService'
 import { apiEnabled } from '../services/api'
 
 export default function AuthProvider({ children }) {
@@ -36,6 +36,24 @@ export default function AuthProvider({ children }) {
     setUser(null)
   }, [])
 
-  const value = useMemo(() => ({ user, loading, demo: !apiEnabled, register, login, logout }), [user, loading, register, login, logout])
+  // Settings page actions. They throw an Error with a friendly message on failure.
+  const saveProfile = useCallback(async (details) => {
+    const updated = await updateProfile(details)
+    setUser((u) => ({ ...u, ...updated }))
+  }, [])
+
+  const setPassword = useCallback(async (current, next) => {
+    setUser(await changePassword(current, next))
+  }, [])
+
+  const removeAccount = useCallback(async (password) => {
+    await deleteAccount(password)
+    setUser(null)
+  }, [])
+
+  const value = useMemo(
+    () => ({ user, loading, demo: !apiEnabled, register, login, logout, saveProfile, setPassword, removeAccount }),
+    [user, loading, register, login, logout, saveProfile, setPassword, removeAccount],
+  )
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }

@@ -19,7 +19,12 @@ import Auth from './pages/Auth/Auth'
 import RequireAuth from './components/RequireAuth'
 import Orders from './pages/Orders/Orders'
 import Viewings from './pages/Viewings/Viewings'
+import Settings from './pages/Settings/Settings'
+import Messages from './pages/Messages/Messages'
+import Payments from './pages/Payments/Payments'
 import ComingSoon from './pages/ComingSoon/ComingSoon'
+import Help from './pages/Info/Help'
+import Legal from './pages/Info/Legal'
 import NotFound from './pages/NotFound/NotFound'
 
 // The route table: which URL shows which page.
@@ -49,11 +54,14 @@ export default function App() {
           <Route path="/reports/new" element={<ReportProblem />} />
           <Route path="/viewings" element={<Viewings />} />
           <Route path="/orders" element={<Orders />} />
-          <Route path="/messages" element={<ComingSoon title="Messages" />} />
+          <Route path="/messages" element={<Messages />} />
+          <Route path="/messages/:id" element={<Messages />} />
+          <Route path="/payments" element={<Payments />} />
+          <Route path="/settings" element={<Settings />} />
         </Route>
-        <Route path="/help" element={<ComingSoon title="Help Center" />} />
-        <Route path="/terms" element={<ComingSoon title="Terms of Service" />} />
-        <Route path="/privacy" element={<ComingSoon title="Privacy Statement" />} />
+        <Route path="/help" element={<Help />} />
+        <Route path="/terms" element={<Legal kind="terms" />} />
+        <Route path="/privacy" element={<Legal kind="privacy" />} />
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>
