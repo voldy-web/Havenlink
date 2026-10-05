@@ -1,16 +1,18 @@
-// All property data goes through this file. Today it filters mock data
-// in the browser; when the backend exists, only the inside of these
-// functions changes (to call the API) and the pages stay the same.
-import { properties } from '../data/properties'
+// All property data goes through this file. The homes come from services/catalog.js
+// (the database through the API, or the sample data in demo mode) and are filtered
+// here in the browser.
 import { agents } from '../data/agents'
+import { loadProperties } from './catalog'
 
 export async function getFeaturedProperties() {
+  const properties = await loadProperties()
   return properties.filter((p) => p.featured)
 }
 
 // Returns one page of listings that match the filters, plus the total
 // number of matches and how many listings exist per property type.
 export async function getProperties(filters) {
+  const properties = await loadProperties()
   const {
     type, location, minPrice, maxPrice, propertyTypes, beds, baths,
     available, features, verifiedOnly, sort, page, perPage,
@@ -55,11 +57,13 @@ export async function getProperties(filters) {
 
 // One listing by its id (from the page address), or null if it doesn't exist.
 export async function getPropertyById(id) {
+  const properties = await loadProperties()
   return properties.find((p) => p.id === Number(id)) || null
 }
 
 // Other listings of the same kind, preferring the same city.
 export async function getSimilarProperties(property, count = 2) {
+  const properties = await loadProperties()
   const others = properties.filter(
     (p) => p.id !== property.id && p.listingType === property.listingType,
   )

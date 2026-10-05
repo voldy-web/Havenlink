@@ -78,7 +78,9 @@ export default function PropertyDetail() {
   }
 
   const forRent = property.listingType === 'rent'
-  const mapBox = `${property.lng - 0.01}%2C${property.lat - 0.006}%2C${property.lng + 0.01}%2C${property.lat + 0.006}`
+  // Homes posted by owners may have no map position; then the map is left out.
+  const hasMap = Number.isFinite(property.lat) && Number.isFinite(property.lng)
+  const mapBox = hasMap ? `${property.lng - 0.01}%2C${property.lat - 0.006}%2C${property.lng + 0.01}%2C${property.lat + 0.006}` : ''
   const facts = [
     { icon: 'bed', value: property.beds, label: property.beds === 1 ? 'Bedroom' : 'Bedrooms' },
     { icon: 'bath', value: property.baths, label: property.baths === 1 ? 'Bathroom' : 'Bathrooms' },
@@ -192,22 +194,26 @@ export default function PropertyDetail() {
           <section className="panel">
             <div className="panel__head">
               <h2>Location &amp; Neighbourhood</h2>
-              <a
-                className="panel__link"
-                href={`https://www.openstreetmap.org/?mlat=${property.lat}&mlon=${property.lng}#map=16/${property.lat}/${property.lng}`}
-                target="_blank"
-                rel="noreferrer"
-              >
-                Open in Maps <Icon name="external" size={13} />
-              </a>
+              {hasMap && (
+                <a
+                  className="panel__link"
+                  href={`https://www.openstreetmap.org/?mlat=${property.lat}&mlon=${property.lng}#map=16/${property.lat}/${property.lng}`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Open in Maps <Icon name="external" size={13} />
+                </a>
+              )}
             </div>
             <p className="panel__sub">{property.area}, {property.city}</p>
-            <iframe
-              className="map"
-              title={`Map showing ${property.title}`}
-              loading="lazy"
-              src={`https://www.openstreetmap.org/export/embed.html?bbox=${mapBox}&layer=mapnik&marker=${property.lat}%2C${property.lng}`}
-            />
+            {hasMap && (
+              <iframe
+                className="map"
+                title={`Map showing ${property.title}`}
+                loading="lazy"
+                src={`https://www.openstreetmap.org/export/embed.html?bbox=${mapBox}&layer=mapnik&marker=${property.lat}%2C${property.lng}`}
+              />
+            )}
             {details.nearby.length > 0 && (
               <ul className="nearby">
                 {details.nearby.map((n) => (
@@ -244,6 +250,22 @@ export default function PropertyDetail() {
               <div className="agent__buttons">
                 <Link to={`/messages/new?property=${property.id}`}><Icon name="chat" size={16} /> Chat with {agent.name.split(' ')[0]}</Link>
                 <a href={`tel:${agent.phone}`}><Icon name="phone" size={16} /> Direct Call</a>
+              </div>
+            </section>
+          )}
+          {!agent && property.ownerName && (
+            <section className="agent">
+              <div className="agent__who">
+                <span className="agent__avatar" aria-hidden="true">
+                  {property.ownerName.split(' ').map((w) => w[0]).join('').slice(0, 2).toUpperCase()}
+                </span>
+                <div>
+                  <h3>{property.ownerName}</h3>
+                  <p>Property owner</p>
+                </div>
+              </div>
+              <div className="agent__buttons">
+                <Link to={`/messages/new?property=${property.id}`}><Icon name="chat" size={16} /> Message {property.ownerName.split(' ')[0]}</Link>
               </div>
             </section>
           )}

@@ -47,3 +47,7 @@
 .viewings__actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); margin-top: var(--space-4); }
 .viewings__actions .rcard__demo { margin: 0; }
 .rcard h2 a:hover { color: var(--color-primary); }
+
+.rcard__status.is-wait { background: #fff1d6; color: #8a5300; }
+.rcard__help { margin: var(--space-2) 0 0; font-size: 13px; color: var(--color-text); }
+.rcard__ownernote { margin-top: 2px; font-style: italic; color: var(--color-primary); }

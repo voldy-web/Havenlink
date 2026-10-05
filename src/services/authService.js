@@ -130,3 +130,18 @@ export async function deleteAccount(password) {
   localStorage.setItem(ACCOUNTS_KEY, JSON.stringify(read(ACCOUNTS_KEY, []).filter((a) => a.email !== email)))
   demoSignOut()
 }
+
+// ---- Forgotten password (real accounts only: it needs the server to send an email) ----
+const NEEDS_SERVER = 'Password reset needs the live server. Demo accounts have no passwords to reset.'
+
+export async function requestPasswordReset(email) {
+  if (!apiEnabled) return { error: NEEDS_SERVER }
+  const res = await api('/auth/forgot', { method: 'POST', body: { email } })
+  return res.ok ? { message: res.data.message } : { error: res.data.error || 'Something went wrong. Please try again.' }
+}
+
+export async function resetPassword(token, password) {
+  if (!apiEnabled) return { error: NEEDS_SERVER }
+  const res = await api('/auth/reset', { method: 'POST', body: { token, password } })
+  return res.ok ? { message: res.data.message } : { error: res.data.error || 'Something went wrong. Please try again.', fields: res.data.fields }
+}

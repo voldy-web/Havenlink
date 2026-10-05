@@ -21,9 +21,11 @@ export default function Auth({ mode }) {
   const navigate = useNavigate()
   const [params] = useSearchParams()
   const next = safeNext(params.get('next'))
-  const [form, setForm] = useState({ name: '', email: '', phone: '', password: '', role: 'resident', agree: false })
+  const wantedRole = roles.some((r) => r.id === params.get('role')) ? params.get('role') : 'resident'
+  const [form, setForm] = useState({ name: '', email: '', phone: '', password: '', role: wantedRole, agree: false })
   const [errors, setErrors] = useState({})
   const [busy, setBusy] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
   const set = (patch) => setForm((f) => ({ ...f, ...patch }))
 
   if (loading) return null
@@ -105,9 +107,15 @@ export default function Auth({ mode }) {
         )}
         <label className="auth__field">
           <span>Password</span>
-          <input type="password" value={form.password} onChange={(e) => set({ password: e.target.value })} autoComplete={isRegister ? 'new-password' : 'current-password'} aria-invalid={Boolean(errors.password)} />
+          <span className="auth__pw">
+            <input type={showPassword ? 'text' : 'password'} value={form.password} onChange={(e) => set({ password: e.target.value })} autoComplete={isRegister ? 'new-password' : 'current-password'} aria-invalid={Boolean(errors.password)} />
+            <button type="button" className="auth__eye" onClick={() => setShowPassword((v) => !v)} aria-label={showPassword ? 'Hide password' : 'Show password'} aria-pressed={showPassword}>
+              <Icon name={showPassword ? 'eye-off' : 'eye'} size={18} />
+            </button>
+          </span>
           {errors.password && <em>{errors.password}</em>}
         </label>
+        {!isRegister && <Link to="/forgot-password" className="auth__forgot">Forgot password?</Link>}
 
         {isRegister && (
           <label className="auth__agree">

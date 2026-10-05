@@ -31,3 +31,10 @@ export async function requireAuth(req, _res, next) {
   req.user = rows[0]
   next()
 }
+
+// Protects a route so only some roles may use it, for example requireRole('owner').
+// Use it AFTER requireAuth.
+export const requireRole = (...roles) => (req, _res, next) => {
+  if (!roles.includes(req.user.role)) throw new HttpError(403, 'Your account type cannot do this.')
+  next()
+}

@@ -6,6 +6,9 @@ const TOKEN_KEY = 'havenlink_token'
 
 export const apiEnabled = Boolean(API_URL)
 
+// The web address of a photo that an owner uploaded to the server.
+export const uploadedPhotoUrl = (id) => `${API_URL}/api/images/${id}`
+
 // Buttons that let you push your own report or order to the next stage, for
 // trying things out. Always on in demo mode. With the real API they need
 // VITE_DEMO_TOOLS=true here AND DEMO_TOOLS=true on the server.

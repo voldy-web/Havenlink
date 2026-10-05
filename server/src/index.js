@@ -1,10 +1,12 @@
 import { config } from './config.js'
 import { pool } from './db/pool.js'
 import { runMigrations } from './db/migrate.js'
+import { seedCatalog } from './db/seedCatalog.js'
 import { createApp } from './app.js'
 
-// Make sure the database tables exist, then start listening.
+// Make sure the database tables exist and the starter homes and products are loaded, then start listening.
 await runMigrations(pool)
+console.log('Catalog ready:', await seedCatalog())
 const server = createApp().listen(config.port, () => {
   console.log(`Haven Link API listening on port ${config.port}`)
 })

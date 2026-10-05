@@ -9,12 +9,14 @@ process.env.DEMO_TOOLS = 'true'
 const { createApp } = await import('../src/app.js')
 const { pool } = await import('../src/db/pool.js')
 const { runMigrations } = await import('../src/db/migrate.js')
+const { seedCatalog } = await import('../src/db/seedCatalog.js')
 
 export { pool }
 
 export async function startServer() {
   await runMigrations(pool)
-  await pool.query('truncate users cascade')
+  await pool.query('truncate users cascade') // also empties tables that point at users, so the catalog is loaded after
+  await seedCatalog()
   const server = createApp().listen(0)
   await new Promise((resolve) => server.once('listening', resolve))
   const base = `http://127.0.0.1:${server.address().port}`

@@ -1,8 +1,9 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import Icon from '../../components/ui/Icon'
 import Button from '../../components/ui/Button'
 import { createReport } from '../../services/reportService'
+import { listMyTenancies } from '../../services/tenancyService'
 import { reportCategories, urgencies, EMERGENCY_PHONE } from '../../data/reportOptions'
 import { resizeImage } from '../../utils/image'
 import './ReportProblem.css'
@@ -23,6 +24,18 @@ export default function ReportProblem() {
   const [done, setDone] = useState(null)
   const fileInput = useRef(null)
   const set = (patch) => setForm((f) => ({ ...f, ...patch }))
+
+  // If you are renting through Haven Link, the home is filled in for you (and the owner receives the report).
+  useEffect(() => {
+    let ignore = false
+    listMyTenancies()
+      .then((all) => {
+        const current = all.find((t) => t.status === 'Active' || t.status === 'Notice given')
+        if (current && !ignore) setForm((f) => (f.home ? f : { ...f, home: current.propertyTitle }))
+      })
+      .catch(() => {})
+    return () => { ignore = true }
+  }, [])
 
   async function addPhotos(e) {
     const files = [...e.target.files].slice(0, MAX_PHOTOS - photos.length)
@@ -91,7 +104,7 @@ export default function ReportProblem() {
           <input value={form.home} onChange={(e) => set({ home: e.target.value })} placeholder="e.g. 12 Palm Avenue, Flat 3, East Legon" aria-invalid={Boolean(errors.home)} />
           {errors.home && <em>{errors.home}</em>}
         </label>
-        <p className="rp__note">Reporting is meant for tenants and people who have reserved a home. Accounts will check this once login is added.</p>
+        <p className="rp__note">Reporting is meant for tenants. If you rent your home through Haven Link, the owner receives this report and can update you here as they work on it.</p>
       </section>
 
       <section className="rp-panel">

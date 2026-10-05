@@ -11,6 +11,7 @@ import './DashboardLayout.css'
 const links = [
   { to: '/dashboard', label: 'Overview', icon: 'home', end: true },
   { to: '/dashboard/saved', label: 'Saved Homes', icon: 'heart' },
+  { to: '/tenancy', label: 'My Tenancy', icon: 'key' },
   { to: '/reports', label: 'My Reports', icon: 'shield' },
   { to: '/viewings', label: 'Viewings', icon: 'calendar' },
   { to: '/orders', label: 'Orders', icon: 'truck' },
@@ -28,6 +29,10 @@ export default function DashboardLayout() {
 
   // Signed-out visitors go to the login page, then come straight back here.
   if (!user) return <Navigate to={`/login?next=${encodeURIComponent(pathname + search)}`} replace />
+
+  // Owners and admins have their own areas.
+  if (user.role === 'owner') return <Navigate to="/owner" replace />
+  if (user.role === 'admin') return <Navigate to="/admin" replace />
 
   // Only the resident dashboard is built so far; other portals come after the backend.
   if (user.role !== 'resident') {

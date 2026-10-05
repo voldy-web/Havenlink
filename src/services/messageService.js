@@ -102,3 +102,7 @@ export const sendMessage = (id, body) =>
 // Testing tool: adds a reply from the other side (the real API also needs DEMO_TOOLS=true).
 export const simulateReply = (id) =>
   apiEnabled ? apiOrThrow(`/messages/${id}/demo-reply`, { method: 'POST', body: {} }).then((d) => d.message) : demoReplyFrom(id)
+
+// Tells the menu badges to re-count straight away (for example after opening a conversation).
+export const MESSAGES_CHANGED = 'havenlink:messages-changed'
+export const announceMessagesChanged = () => window.dispatchEvent(new Event(MESSAGES_CHANGED))

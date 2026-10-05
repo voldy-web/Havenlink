@@ -7,14 +7,14 @@ import { useCart } from '../../hooks/useCart'
 import { useAuth } from '../../hooks/useAuth'
 import './Navbar.css'
 
-// Main navigation links, in the order shown in the design.
+// Main navigation links (Dashboard first, as requested).
 const links = [
+  { to: '/dashboard', label: 'Dashboard' },
   { to: '/', label: 'Home' },
   { to: '/properties?type=buy', label: 'Buy' },
   { to: '/properties?type=rent', label: 'Rent' },
   { to: '/services', label: 'Services' },
   { to: '/shop', label: 'Shop' },
-  { to: '/dashboard', label: 'Dashboard' },
 ]
 
 export default function Navbar() {

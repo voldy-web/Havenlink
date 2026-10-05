@@ -125,39 +125,73 @@ test('reports: advance moves through the four stages, only for the owner', async
 })
 
 // ---------- orders ----------
+// Product 2 is the Kanso sofa (GH₵3,900, option "Layout: Left Chaise" adds GH₵550).
+// Product 14 is the electric kettle (GH₵180). Prices are read from the database, never from the browser.
 const order = (over = {}) => ({
-  items: [{ productId: 2, name: 'Kanso Sofa', qty: 1, unitPrice: 3900, choices: { Layout: 'Left Chaise' } }],
+  items: [{ productId: 2, qty: 1, choices: { Layout: 'Left Chaise' } }],
   address: { name: 'Ama Mensah', phone: '0241234567', street: '5 Test Road', area: 'Osu', city: 'Accra', notes: '' },
   deliveryDate: tomorrow(), deliveryWindow: '1:00 PM - 4:00 PM', paymentMethod: 'MTN MoMo', paid: true, ...over,
 })
 
-test('orders: create, totals are worked out by the server, private to the owner', async () => {
+test('orders: create, totals come from database prices, private to the owner', async () => {
   const r = await post('/api/orders', order({ subtotal: 1, total: 1, deliveryFee: 0 }))
   assert.equal(r.status, 201)
   const o = r.body.order
   assert.match(o.reference, /^HL-O-\d{6}$/)
-  assert.equal(o.subtotal, 3900)
+  assert.equal(o.subtotal, 4450) // 3900 + 550 for the chaise
   assert.equal(o.deliveryFee, 0)
-  assert.equal(o.total, 3900)
-  assert.equal(o.items[0].choices.Layout, 'Left Chaise')
+  assert.equal(o.total, 4450)
+  assert.equal(o.items[0].name, 'Kanso Bouclé Modular 3-Seater Sofa')
+  assert.equal(o.items[0].unitPrice, 4450)
+  assert.deepEqual(o.items[0].choices, { Layout: 'Left Chaise', Upholstery: 'Warm Oat' }) // unspecified options get the first choice
   assert.equal(o.address.street, '5 Test Road')
   assert.deepEqual(o.history.map((h) => h.status), ['Confirmed'])
   assert.equal((await get('/api/orders', kojo)).body.orders.length, 0)
 })
 
+test('orders: prices and names sent by the browser are ignored', async () => {
+  const r = await post('/api/orders', order({ items: [{ productId: 14, qty: 2, name: 'Free kettle', unitPrice: 1, price: 0 }] }))
+  assert.equal(r.status, 201)
+  assert.equal(r.body.order.items[0].name, 'Stainless Steel Electric Kettle 1.7L')
+  assert.equal(r.body.order.items[0].unitPrice, 180)
+  assert.equal(r.body.order.subtotal, 360)
+})
+
 test('orders: delivery fee applies under GH₵3,000 and totals add up', async () => {
-  const r = await post('/api/orders', order({ items: [{ productId: 9, name: 'Kettle', qty: 3, unitPrice: 180 }] }))
+  const r = await post('/api/orders', order({ items: [{ productId: 14, qty: 3 }] }))
   assert.equal(r.body.order.subtotal, 540)
   assert.equal(r.body.order.deliveryFee, 80)
   assert.equal(r.body.order.total, 620)
 })
 
+test('orders: unknown products and invalid options are refused', async () => {
+  for (const items of [
+    [{ productId: 999999, qty: 1 }],
+    [{ productId: 2, qty: 1, choices: { Layout: 'Free Sofa' } }],
+    [{ productId: 2, qty: 1, choices: { Colour: 'Red' } }],
+    [{ productId: 14, qty: 1, choices: { Layout: 'Left Chaise' } }],
+  ]) {
+    const r = await post('/api/orders', order({ items }))
+    assert.equal(r.status, 400, JSON.stringify(items))
+    assert.ok(r.body.fields.items)
+  }
+})
+
+test('orders: sold-out products and quantities over the stock are refused', async () => {
+  await pool.query('update products set stock = 0 where id = 14')
+  assert.equal((await post('/api/orders', order({ items: [{ productId: 14, qty: 1 }] }))).status, 400)
+  await pool.query('update products set stock = 2 where id = 14')
+  assert.equal((await post('/api/orders', order({ items: [{ productId: 14, qty: 3 }] }))).status, 400)
+  assert.equal((await post('/api/orders', order({ items: [{ productId: 14, qty: 2 }] }))).status, 201)
+  await pool.query('update products set stock = 30 where id = 14')
+})
+
 test('orders: bad input is refused', async () => {
   for (const bad of [
     order({ items: [] }),
-    order({ items: [{ productId: 1, name: 'x', qty: 0, unitPrice: 5 }] }),
-    order({ items: [{ productId: 1, name: 'x', qty: 1, unitPrice: -5 }] }),
-    order({ items: [{ productId: 1, name: 'x', qty: 1, unitPrice: 'free' }] }),
+    order({ items: [{ productId: 1, qty: 0 }] }),
+    order({ items: [{ productId: 1, qty: 11 }] }),
+    order({ items: [{ productId: 'abc', qty: 1 }] }),
     order({ address: { name: 'A', phone: '1', street: '', area: '', city: '' } }),
     order({ deliveryDate: '2020-01-01' }),
     order({ paymentMethod: '' }),

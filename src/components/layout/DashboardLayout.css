@@ -14,3 +14,5 @@
 .dash-soon { max-width: 620px; padding: var(--space-8) var(--space-4); text-align: center; }
 .dash-soon p { margin: var(--space-3) 0 var(--space-5); }
 .dash-soon div { display: flex; justify-content: center; flex-wrap: wrap; gap: var(--space-3); }
+
+.dash__nav .msg__nav-badge { margin-left: auto; display: grid; place-items: center; min-width: 20px; height: 20px; padding: 0 6px; border-radius: var(--radius-pill); background: var(--color-primary); color: #fff; font-size: 11px; font-style: normal; font-weight: 800; }

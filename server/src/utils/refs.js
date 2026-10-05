@@ -1,7 +1,7 @@
 import { randomInt } from 'node:crypto'
 
 // Short reference numbers people can quote, like HL-R-483920.
-export const REF_PATTERN = /^HL-[VROS]-\d{6}$/
+export const REF_PATTERN = /^HL-[VROST]-\d{6}$/
 export const makeRef = (prefix) => `HL-${prefix}-${randomInt(100000, 1000000)}`
 
 // Runs `insert(reference)` with a fresh reference, trying again in the rare

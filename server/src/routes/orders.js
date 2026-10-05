@@ -3,7 +3,7 @@ import { config } from '../config.js'
 import { pool } from '../db/pool.js'
 import { withTransaction } from '../db/tx.js'
 import { HttpError, failIfInvalid } from '../utils/errors.js'
-import { checkName, checkPhone, isDateString, isInt, isMoney, isText, yesterday } from '../utils/validate.js'
+import { checkName, checkPhone, isDateString, isInt, isText, yesterday } from '../utils/validate.js'
 import { insertWithRef, REF_PATTERN } from '../utils/refs.js'
 import { requireAuth } from '../middleware/auth.js'
 
@@ -43,8 +43,9 @@ router.post('/', async (req, res) => {
   const b = req.body ?? {}
   const items = Array.isArray(b.items) ? b.items : []
   const a = b.address ?? {}
-  const itemsOk = items.length >= 1 && items.length <= MAX_ITEMS && items.every((i) => i && isInt(i.productId, 1, 1_000_000)
-    && isText(i.name, 1, 200) && isInt(i.qty, 1, 10) && isMoney(i.unitPrice, 10_000_000)
+  // The browser only says WHICH product, how many and which options. Names and prices come from the database.
+  const itemsOk = items.length >= 1 && items.length <= MAX_ITEMS && items.every((i) => i && isInt(i.productId, 1, 2_000_000_000)
+    && isInt(i.qty, 1, 10)
     && (i.choices === undefined || (i.choices && typeof i.choices === 'object' && !Array.isArray(i.choices)
       && Object.keys(i.choices).length <= 10 && Object.values(i.choices).every((v) => isText(v, 1, 80)))))
   failIfInvalid({
@@ -59,9 +60,34 @@ router.post('/', async (req, res) => {
     paymentMethod: isText(b.paymentMethod, 2, 40) ? null : 'Choose a payment method.',
   })
 
-  // Totals are worked out here from the items. Never trust totals sent by the browser.
-  // (Item prices are still sent by the browser until the products live in the database.)
-  const subtotal = Math.round(items.reduce((sum, i) => sum + i.qty * i.unitPrice, 0) * 100) / 100
+  // Look up every product and work out its real price (base price plus any chosen options).
+  const itemsError = (message) => new HttpError(400, 'Please check your details and try again.', { items: message })
+  const { rows: found } = await pool.query(
+    "select id, name, price, stock, data -> 'options' as options from products where id = any($1) and published",
+    [[...new Set(items.map((i) => i.productId))]],
+  )
+  const byId = new Map(found.map((p) => [p.id, p]))
+  const priced = items.map((i) => {
+    const p = byId.get(i.productId)
+    if (!p) throw itemsError('One of the items in your cart is no longer available.')
+    if (p.stock < 1) throw itemsError(`${p.name} is sold out.`)
+    if (i.qty > p.stock) throw itemsError(`Only ${p.stock} of ${p.name} left.`)
+    const groups = p.options ?? []
+    const asked = i.choices ?? {}
+    if (Object.keys(asked).some((k) => !groups.some((g) => g.name === k))) throw itemsError(`An option for ${p.name} is not valid.`)
+    let extra = 0
+    const choices = {}
+    for (const g of groups) {
+      const pick = g.choices.find((c) => c.label === (asked[g.name] ?? g.choices[0].label))
+      if (!pick) throw itemsError(`An option for ${p.name} is not valid.`)
+      extra += pick.extra
+      choices[g.name] = pick.label
+    }
+    return { productId: p.id, name: p.name, qty: i.qty, unitPrice: Math.round((Number(p.price) + extra) * 100) / 100, choices }
+  })
+
+  // Totals are worked out here from the database prices. Never trust prices or totals sent by the browser.
+  const subtotal = Math.round(priced.reduce((sum, i) => sum + i.qty * i.unitPrice, 0) * 100) / 100
   const deliveryFee = subtotal >= FREE_DELIVERY_OVER ? 0 : DELIVERY_FEE
   const total = subtotal + deliveryFee
   const address = {
@@ -75,9 +101,9 @@ router.post('/', async (req, res) => {
        values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) returning *`,
       [reference, req.user.id, subtotal, deliveryFee, total, b.paymentMethod.trim(), b.paid === true, b.deliveryDate, b.deliveryWindow.trim(), address],
     )
-    for (const i of items) {
+    for (const i of priced) {
       await db.query('insert into order_items (order_id, product_id, name, qty, unit_price, choices) values ($1, $2, $3, $4, $5, $6)',
-        [rows[0].id, i.productId, i.name.trim(), i.qty, i.unitPrice, i.choices ?? {}])
+        [rows[0].id, i.productId, i.name, i.qty, i.unitPrice, i.choices])
     }
     await db.query('insert into order_events (order_id, status) values ($1, $2)', [rows[0].id, 'Confirmed'])
     return rows[0]

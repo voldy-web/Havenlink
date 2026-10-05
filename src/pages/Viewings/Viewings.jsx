@@ -6,6 +6,16 @@ import { getMyViewings, cancelViewing } from '../../services/viewingService'
 import { fromISO, longDate, startOfToday } from '../../utils/dates'
 import '../MyReports/MyReports.css'
 
+// How each status is coloured.
+const statusClass = { Confirmed: 'is-done', Pending: '', Rescheduled: 'is-wait', Declined: 'is-cancelled', Cancelled: 'is-cancelled' }
+// What each status means for the visitor.
+const statusHelp = {
+  Pending: 'Waiting for the owner to respond.',
+  Confirmed: 'The owner has confirmed this viewing.',
+  Rescheduled: 'The owner suggested this new time. Cancel the viewing if it does not suit you.',
+  Declined: 'The owner could not offer this viewing.',
+}
+
 export default function Viewings() {
   const [viewings, setViewings] = useState(null)
   const [tab, setTab] = useState('Upcoming')
@@ -18,7 +28,7 @@ export default function Viewings() {
 
   if (!viewings) return <p>Loading…</p>
   const today = startOfToday()
-  const isUpcoming = (v) => v.status !== 'Cancelled' && fromISO(v.date) >= today
+  const isUpcoming = (v) => v.status !== 'Cancelled' && v.status !== 'Declined' && fromISO(v.date) >= today
   const shown = viewings.filter((v) => (tab === 'Upcoming' ? isUpcoming(v) : !isUpcoming(v)))
 
   return (
@@ -52,10 +62,11 @@ export default function Viewings() {
               <header>
                 <span className="rcard__cat">{v.format === 'video' ? 'Live video tour' : 'In-person'}</span>
                 <small>{v.reference}</small>
-                <b className={`rcard__status ${v.status === 'Cancelled' ? 'is-cancelled' : ''}`}>{v.status}</b>
+                <b className={`rcard__status ${statusClass[v.status] || ''}`}>{v.status}</b>
               </header>
               <h2><Link to={`/properties/${v.propertyId}`}>{v.propertyTitle}</Link></h2>
               <p className="rcard__where"><Icon name="calendar" size={13} /> {longDate(fromISO(v.date))} at {v.time} · {v.attendees} {v.attendees === 1 ? 'person' : 'people'}</p>
+              {statusHelp[v.status] && v.status !== 'Cancelled' && <p className="rcard__help">{statusHelp[v.status]}{v.ownerNote ? <> <b>Owner’s note:</b> {v.ownerNote}</> : null}</p>}
               {isUpcoming(v) && (
                 <div className="viewings__actions">
                   <Button to={`/properties/${v.propertyId}/book`} size="sm" variant="outline">Book again / change</Button>

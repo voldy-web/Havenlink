@@ -12,6 +12,14 @@ import reports from './routes/reports.js'
 import orders from './routes/orders.js'
 import serviceRequests from './routes/serviceRequests.js'
 import messages from './routes/messages.js'
+import catalog from './routes/catalog.js'
+import images from './routes/images.js'
+import ownerListings from './routes/ownerListings.js'
+import ownerViewings from './routes/ownerViewings.js'
+import tenancies from './routes/tenancies.js'
+import ownerTenancies from './routes/ownerTenancies.js'
+import ownerRepairs from './routes/ownerRepairs.js'
+import adminListings from './routes/adminListings.js'
 
 // The Express app (kept separate from index.js so tests can start it).
 export function createApp() {
@@ -30,6 +38,7 @@ export function createApp() {
 
   // Reports accept photos, so they read their own (bigger) request body first.
   app.use('/api/reports', reports)
+  app.use('/api/images', images)
   app.use(express.json({ limit: '100kb' }))
 
   app.use('/api/health', health)
@@ -40,6 +49,13 @@ export function createApp() {
   app.use('/api/orders', orders)
   app.use('/api/service-requests', serviceRequests)
   app.use('/api/messages', messages)
+  app.use('/api/owner', ownerListings)
+  app.use('/api/owner', ownerViewings)
+  app.use('/api/owner', ownerTenancies)
+  app.use('/api/owner', ownerRepairs)
+  app.use('/api/tenancies', tenancies)
+  app.use('/api/admin', adminListings)
+  app.use('/api', catalog)
 
   app.use('/api', (_req, _res, next) => next(new HttpError(404, 'Not found.')))
 

@@ -47,3 +47,16 @@
   .auth__aside { display: none; }
 }
 @media (max-width: 520px) { .auth__roles { grid-template-columns: 1fr; } }
+
+.auth__pw { position: relative; display: block; }
+.auth__pw input { padding-right: 46px; }
+.auth__eye { position: absolute; top: 50%; right: 6px; display: grid; place-items: center; width: 36px; height: 36px; padding: 0; border: 0; border-radius: 50%; background: none; color: var(--color-text); cursor: pointer; transform: translateY(-50%); }
+.auth__eye:hover { background: var(--color-chip); color: var(--color-primary); }
+
+.auth--single { display: block; max-width: 520px; }
+.auth__title { margin-bottom: var(--space-3); font-size: 26px; }
+.auth__hint { margin: 0 0 var(--space-4); font-size: 14px; }
+.auth__ok { display: flex; gap: 8px; margin: 0 0 var(--space-3); padding: var(--space-3); border-radius: var(--radius-sm); background: var(--color-primary-soft); color: var(--color-primary); font-size: 14px; font-weight: 600; }
+.auth__ok svg { flex: none; margin-top: 2px; }
+a.auth__submit { text-decoration: none; }
+.auth__forgot { display: block; margin: -6px 0 var(--space-3); text-align: right; font-size: 13px; font-weight: 700; color: var(--color-primary); }

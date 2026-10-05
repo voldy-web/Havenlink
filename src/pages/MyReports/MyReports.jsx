@@ -75,7 +75,7 @@ export default function MyReports() {
                     return (
                       <li key={s.id} className={i < at || (i === at && s.id === 'Resolved') ? 'is-done' : i === at ? 'is-current' : ''}>
                         <span>{i <= at ? <Icon name="check" size={13} /> : i + 1}</span>
-                        <div><b>{s.id}</b><small>{entry ? when(entry.at) : 'Pending'}</small></div>
+                        <div><b>{s.id}</b><small>{entry ? when(entry.at) : 'Pending'}</small>{entry?.note && <small className="rcard__ownernote">“{entry.note}”</small>}</div>
                       </li>
                     )
                   })}

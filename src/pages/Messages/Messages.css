@@ -69,6 +69,3 @@
   .msg__back { display: block; }
   .msg__prop { display: none; }
 }
-
-/* the badge on the dashboard Messages link */
-.dash__nav .msg__nav-badge { margin-left: auto; display: grid; place-items: center; min-width: 20px; height: 20px; padding: 0 6px; border-radius: var(--radius-pill); background: var(--color-primary); color: #fff; font-size: 11px; font-weight: 800; }

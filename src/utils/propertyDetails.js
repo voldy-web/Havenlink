@@ -16,7 +16,9 @@ export function buildDetails(p) {
   const type = typeNames[p.propertyType] || 'home'
   const forRent = p.listingType === 'rent'
 
-  const description = [
+  // Homes posted by owners bring their own text and photos; the starter homes get generated ones.
+  const own = typeof p.description === 'string'
+  const generated = [
     `${p.title} is a ${p.beds}-bedroom ${type} in ${p.area}, ${p.city}. ` +
       `With ${p.baths} ${p.baths === 1 ? 'bathroom' : 'bathrooms'} and ${p.sqm} sq m of living space, ` +
       (p.status === 'Available'
@@ -25,6 +27,8 @@ export function buildDetails(p) {
     `The neighbourhood is well connected, with shops, transport and daily services close by. ` +
       `${forRent ? 'Book a viewing to see the home in person, or chat with the owner to ask about the terms.' : 'Book a viewing to see the home in person, or chat with the owner to ask about the sale.'}`,
   ]
+
+  const description = own ? p.description.split(/\n\s*\n/).map((x) => x.trim()).filter(Boolean) : generated
 
   const labelOf = (id) => comforts.find((c) => c.id === id)?.label
   const highlights = p.features.map(labelOf).filter(Boolean)
@@ -54,10 +58,12 @@ export function buildDetails(p) {
   const rotated = [...sharedGallery.slice(p.id % sharedGallery.length), ...sharedGallery.slice(0, p.id % sharedGallery.length)]
   const pool = rotated.find((x) => x.kind === 'pool')
   const extras = p.features.includes('pool') && pool ? [pool, ...rotated.filter((x) => x !== pool)] : rotated
-  const gallery = [
-    { src: p.detailImage || p.image, caption: p.title },
-    ...extras.filter((x) => x.src !== (p.detailImage || p.image)).slice(0, 4),
-  ]
+  const gallery = own
+    ? (p.gallery?.length ? p.gallery : [p.image]).map((src, i) => ({ src, caption: i === 0 ? p.title : `${p.title}, photo ${i + 1}` }))
+    : [
+      { src: p.detailImage || p.image, caption: p.title },
+      ...extras.filter((x) => x.src !== (p.detailImage || p.image)).slice(0, 4),
+    ]
 
   return {
     description,

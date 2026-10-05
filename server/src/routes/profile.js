@@ -75,8 +75,8 @@ router.get('/export', async (req, res) => {
     reports: await q('select r.*, (select count(*)::int from report_photos p where p.report_id = r.id) as photo_count from reports r where r.user_id = $1'),
     orders: await q('select o.*, coalesce((select json_agg(i) from order_items i where i.order_id = o.id), \'[]\') as items from orders o where o.user_id = $1'),
     serviceRequests: await q('select * from service_requests where user_id = $1'),
-    conversations: await q('select * from conversations where user_id = $1'),
-    messages: await q('select m.* from messages m join conversations c on c.id = m.conversation_id where c.user_id = $1 order by m.created_at, m.id'),
+    conversations: await q('select * from conversations where user_id = $1 or owner_id = $1'),
+    messages: await q('select m.* from messages m join conversations c on c.id = m.conversation_id where c.user_id = $1 or c.owner_id = $1 order by m.created_at, m.id'),
   }
   res.set('Content-Disposition', 'attachment; filename="havenlink-my-data.json"')
   res.json(data)

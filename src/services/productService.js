@@ -1,10 +1,11 @@
-// All shop product data goes through this file. Today it filters mock data
-// in the browser; later only the inside of these functions changes.
-import { products } from '../data/products'
+// All shop product data goes through this file. The products come from services/catalog.js
+// (the database through the API, or the sample data in demo mode) and are filtered here in the browser.
+import { loadProducts } from './catalog'
 
 const PER_PAGE = 12
 
 export async function getProducts(filters) {
+  const products = await loadProducts()
   const { q, categories, minPrice, maxPrice, vendors, materials, rating, sort, page } = filters
   const text = q.trim().toLowerCase()
 
@@ -42,11 +43,13 @@ export async function getProducts(filters) {
 }
 
 export async function getProductById(id) {
+  const products = await loadProducts()
   return products.find((p) => p.id === Number(id)) || null
 }
 
 // Other products, preferring the same category.
 export async function getRelatedProducts(product, count = 3) {
+  const products = await loadProducts()
   const others = products.filter((p) => p.id !== product.id)
   return [
     ...others.filter((p) => p.category === product.category),
@@ -56,5 +59,6 @@ export async function getRelatedProducts(product, count = 3) {
 
 // Used by the cart to show current product details for saved items.
 export async function getProductsByIds(ids) {
+  const products = await loadProducts()
   return products.filter((p) => ids.includes(p.id))
 }

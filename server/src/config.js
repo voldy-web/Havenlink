@@ -29,7 +29,16 @@ export const config = {
   authRateLimit: Number(env.AUTH_RATE_LIMIT) || 20,
   // Messages a person may send per IP address per minute.
   messageRateLimit: Number(env.MESSAGE_RATE_LIMIT) || 60,
+  // Photo uploads allowed per IP address per 15 minutes.
+  uploadRateLimit: Number(env.UPLOAD_RATE_LIMIT) || 100,
   // TESTING ONLY: lets a person move their own report/order to the next stage,
   // because the owner and vendor sides are not built yet. Keep off for real use.
   demoTools: env.DEMO_TOOLS === 'true',
+  // Where people open the website (used in the links inside emails). Defaults to the first CLIENT_ORIGIN.
+  appUrl: (env.APP_URL || (env.CLIENT_ORIGIN || 'http://localhost:5173').split(',')[0]).trim().replace(/\/$/, ''),
+  // Sending email through Brevo (https://brevo.com) or Resend (https://resend.com). Without a key, emails are only written to the server log.
+  brevoApiKey: env.BREVO_API_KEY || '',
+  resendApiKey: env.RESEND_API_KEY || '',
+  // The address emails come from. With Brevo it must be a sender you have verified there.
+  mailFrom: env.MAIL_FROM || 'Haven Link <onboarding@resend.dev>',
 }

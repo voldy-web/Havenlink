@@ -11,8 +11,9 @@ router.use(requireAuth)
 const toViewing = (r) => ({
   reference: r.reference, propertyId: r.property_id, propertyTitle: r.property_title, format: r.format,
   date: r.viewing_date, time: r.viewing_time, attendees: r.attendees, name: r.name, phone: r.phone,
-  email: r.email, moveIn: r.move_in || '', pet: r.pet, status: r.status, createdAt: r.created_at,
+  email: r.email, moveIn: r.move_in || '', pet: r.pet, status: r.status, ownerNote: r.owner_note, respondedAt: r.responded_at, createdAt: r.created_at,
 })
+export { toViewing }
 
 router.get('/', async (req, res) => {
   const { rows } = await pool.query('select * from viewings where user_id = $1 order by created_at desc', [req.user.id])
@@ -50,11 +51,15 @@ router.post('/', async (req, res) => {
 
 router.patch('/:reference/cancel', async (req, res) => {
   if (!REF_PATTERN.test(req.params.reference)) throw new HttpError(404, 'Viewing not found.')
+  // A viewing that was declined or already cancelled cannot be cancelled again.
   const { rows } = await pool.query(
-    "update viewings set status = 'Cancelled' where reference = $1 and user_id = $2 returning *",
+    "update viewings set status = 'Cancelled' where reference = $1 and user_id = $2 and status in ('Pending', 'Confirmed', 'Rescheduled') returning *",
     [req.params.reference, req.user.id],
   )
-  if (!rows[0]) throw new HttpError(404, 'Viewing not found.')
+  if (!rows[0]) {
+    const exists = (await pool.query('select 1 from viewings where reference = $1 and user_id = $2', [req.params.reference, req.user.id])).rows[0]
+    throw new HttpError(exists ? 409 : 404, exists ? 'This viewing can no longer be cancelled.' : 'Viewing not found.')
+  }
   res.json({ viewing: toViewing(rows[0]) })
 })
 

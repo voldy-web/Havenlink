@@ -20,18 +20,18 @@ const MAX_PHOTOS = 3
 const PHOTO_PATTERN = /^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+/]+={0,2}$/
 
 // Turns database rows into the shape the website uses (photos and history included).
-async function toReports(rows) {
+export async function toReports(rows) {
   if (!rows.length) return []
   const ids = rows.map((r) => r.id)
   const [photos, events] = await Promise.all([
     pool.query('select report_id, image from report_photos where report_id = any($1) order by position, id', [ids]),
-    pool.query('select report_id, status, created_at from report_events where report_id = any($1) order by created_at, id', [ids]),
+    pool.query('select report_id, status, note, created_at from report_events where report_id = any($1) order by created_at, id', [ids]),
   ])
   return rows.map((r) => ({
     reference: r.reference, category: r.category, urgency: r.urgency, summary: r.summary,
     description: r.description, home: r.home, status: r.status, createdAt: r.created_at,
     photos: photos.rows.filter((p) => p.report_id === r.id).map((p) => p.image),
-    history: events.rows.filter((e) => e.report_id === r.id).map((e) => ({ status: e.status, at: e.created_at })),
+    history: events.rows.filter((e) => e.report_id === r.id).map((e) => ({ status: e.status, at: e.created_at, note: e.note })),
   }))
 }
 
@@ -55,9 +55,11 @@ router.post('/', async (req, res) => {
   })
 
   const row = await insertWithRef('R', (reference) => withTransaction(async (db) => {
+    // A resident who lives in a home through HavenLink has the report sent to that home's owner.
+    const tenancy = (await db.query("select id from tenancies where resident_id = $1 and status in ('Active', 'Notice given') limit 1", [req.user.id])).rows[0]
     const { rows } = await db.query(
-      'insert into reports (reference, user_id, category, urgency, summary, description, home) values ($1, $2, $3, $4, $5, $6, $7) returning *',
-      [reference, req.user.id, b.category, b.urgency, b.summary.trim(), b.description.trim(), b.home.trim()],
+      'insert into reports (reference, user_id, category, urgency, summary, description, home, tenancy_id) values ($1, $2, $3, $4, $5, $6, $7, $8) returning *',
+      [reference, req.user.id, b.category, b.urgency, b.summary.trim(), b.description.trim(), b.home.trim(), tenancy?.id ?? null],
     )
     await db.query('insert into report_events (report_id, status) values ($1, $2)', [rows[0].id, 'Submitted'])
     for (const [position, image] of photos.entries()) {
