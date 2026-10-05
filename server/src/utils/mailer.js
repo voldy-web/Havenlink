@@ -5,7 +5,8 @@ import { config } from '../config.js'
 export const outbox = []
 
 // "Haven Link <no-reply@example.com>" -> { name, email }
-function parseFrom(from) {
+function parseFrom(raw) {
+  const from = raw.replace(/\s+/g, ' ').trim() // stray spaces or line breaks pasted into the setting do no harm
   const m = from.match(/^\s*(.*?)\s*<([^>]+)>\s*$/)
   return m ? { name: m[1].replace(/^"|"$/g, '') || 'Haven Link', email: m[2] } : { name: 'Haven Link', email: from.trim() }
 }
