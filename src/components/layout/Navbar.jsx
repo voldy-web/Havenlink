@@ -7,9 +7,8 @@ import { useCart } from '../../hooks/useCart'
 import { useAuth } from '../../hooks/useAuth'
 import './Navbar.css'
 
-// Main navigation links (Dashboard first, as requested).
+// Main navigation links. Anyone can browse these; the Dashboard link is added in front for signed-in people only.
 const links = [
-  { to: '/dashboard', label: 'Dashboard' },
   { to: '/', label: 'Home' },
   { to: '/properties?type=buy', label: 'Buy' },
   { to: '/properties?type=rent', label: 'Rent' },
@@ -21,6 +20,9 @@ export default function Navbar() {
   const { pathname, search } = useLocation()
   const { count } = useCart()
   const { user, logout } = useAuth()
+  // Where "Dashboard" leads depends on the account type: owners and admins have their own areas.
+  const dashboard = user?.role === 'owner' ? '/owner' : user?.role === 'admin' ? '/admin' : '/dashboard'
+  const shownLinks = user ? [{ to: dashboard, label: 'Dashboard' }, ...links] : links
 
   // A link is "active" when its page is open. Buy and Rent share the
   // /properties page, so for those we also compare the ?type= value.
@@ -45,7 +47,7 @@ export default function Navbar() {
         </Link>
 
         <nav className={`navbar__links ${menuOpen ? 'is-open' : ''}`}>
-          {links.map((link) => (
+          {shownLinks.map((link) => (
             <Link
               key={link.label}
               to={link.to}
@@ -67,13 +69,15 @@ export default function Navbar() {
           {count > 0 && <span>{count}</span>}
         </Link>
 
-        <Button to="/properties/new" size="sm" className="navbar__post">
-          + Post Property
-        </Button>
+        {user?.role === 'owner' && (
+          <Button to="/owner/new" size="sm" className="navbar__post">
+            + Post Property
+          </Button>
+        )}
 
         {user ? (
           <div className="navbar__account">
-            <Link to="/dashboard" className="navbar__user" onClick={closeMenu}>
+            <Link to={dashboard} className="navbar__user" onClick={closeMenu}>
               <span className="navbar__avatar" aria-hidden="true">{user.name.split(' ').map((w) => w[0]).slice(0, 2).join('').toUpperCase()}</span>
               <span className="navbar__username">{user.name.split(' ')[0]}</span>
             </Link>

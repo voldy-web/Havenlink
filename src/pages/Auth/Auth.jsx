@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom'
 import Icon from '../../components/ui/Icon'
 import GoogleButton from '../../components/auth/GoogleButton'
+import PasswordInput from '../../components/ui/PasswordInput'
+import heroPhoto from '../../assets/mock/home-hero-lounge.jpg'
 import { googleEnabled } from '../../services/googleConfig'
 import { useAuth } from '../../hooks/useAuth'
 import { roles } from '../../data/roles'
@@ -27,7 +29,6 @@ export default function Auth({ mode }) {
   const [form, setForm] = useState({ name: '', email: '', phone: '', password: '', role: wantedRole, agree: false })
   const [errors, setErrors] = useState({})
   const [busy, setBusy] = useState(false)
-  const [showPassword, setShowPassword] = useState(false)
   const [linkedUser, setLinkedUser] = useState(null) // set after an email account is linked to Google
   const set = (patch) => setForm((f) => ({ ...f, ...patch }))
 
@@ -79,7 +80,7 @@ export default function Auth({ mode }) {
 
   return (
     <div className="container auth">
-      <aside className="auth__aside">
+      <aside className="auth__aside" style={{ '--auth-photo': `url(${heroPhoto})` }}>
         <h1>One place for your whole housing journey.</h1>
         <p>Find a home, book a viewing, report problems, hire trusted pros and furnish your space.</p>
         <ul>
@@ -90,6 +91,10 @@ export default function Auth({ mode }) {
       </aside>
 
       <form className="auth__card" onSubmit={submit} noValidate>
+        <header className="auth__head">
+          <h2>{isRegister ? 'Create your account' : 'Welcome back'}</h2>
+          <p>{isRegister ? 'Join Haven Link in a minute. It is free.' : 'Sign in to manage your viewings, reports and orders.'}</p>
+        </header>
         <div className="auth__tabs" role="tablist">
           <Link role="tab" aria-selected={isRegister} className={isRegister ? 'is-active' : ''} to={`/register${next === '/dashboard' ? '' : `?next=${encodeURIComponent(next)}`}`}>Create an Account</Link>
           <Link role="tab" aria-selected={!isRegister} className={!isRegister ? 'is-active' : ''} to={`/login${next === '/dashboard' ? '' : `?next=${encodeURIComponent(next)}`}`}>Sign In</Link>
@@ -114,30 +119,28 @@ export default function Auth({ mode }) {
         {isRegister && (
           <label className="auth__field">
             <span>Full name</span>
-            <input value={form.name} onChange={(e) => set({ name: e.target.value })} autoComplete="name" aria-invalid={Boolean(errors.name)} />
+            <span className="auth__input"><Icon name="user" size={17} />
+              <input value={form.name} onChange={(e) => set({ name: e.target.value })} autoComplete="name" placeholder="Ama Mensah" aria-invalid={Boolean(errors.name)} /></span>
             {errors.name && <em>{errors.name}</em>}
           </label>
         )}
         <label className="auth__field">
           <span>Email address</span>
-          <input type="email" value={form.email} onChange={(e) => set({ email: e.target.value })} autoComplete="email" aria-invalid={Boolean(errors.email)} />
+          <span className="auth__input"><Icon name="mail" size={17} />
+            <input type="email" value={form.email} onChange={(e) => set({ email: e.target.value })} autoComplete="email" placeholder="you@example.com" aria-invalid={Boolean(errors.email)} /></span>
           {errors.email && <em>{errors.email}</em>}
         </label>
         {isRegister && (
           <label className="auth__field">
             <span>Phone number</span>
-            <input type="tel" value={form.phone} onChange={(e) => set({ phone: e.target.value })} placeholder="024 123 4567" autoComplete="tel" aria-invalid={Boolean(errors.phone)} />
+            <span className="auth__input"><Icon name="phone" size={17} />
+              <input type="tel" value={form.phone} onChange={(e) => set({ phone: e.target.value })} placeholder="024 123 4567" autoComplete="tel" aria-invalid={Boolean(errors.phone)} /></span>
             {errors.phone && <em>{errors.phone}</em>}
           </label>
         )}
         <label className="auth__field">
           <span>Password</span>
-          <span className="auth__pw">
-            <input type={showPassword ? 'text' : 'password'} value={form.password} onChange={(e) => set({ password: e.target.value })} autoComplete={isRegister ? 'new-password' : 'current-password'} aria-invalid={Boolean(errors.password)} />
-            <button type="button" className="auth__eye" onClick={() => setShowPassword((v) => !v)} aria-label={showPassword ? 'Hide password' : 'Show password'} aria-pressed={showPassword}>
-              <Icon name={showPassword ? 'eye-off' : 'eye'} size={18} />
-            </button>
-          </span>
+          <PasswordInput value={form.password} onChange={(e) => set({ password: e.target.value })} autoComplete={isRegister ? 'new-password' : 'current-password'} invalid={Boolean(errors.password)} />
           {errors.password && <em>{errors.password}</em>}
         </label>
         {!isRegister && <Link to="/forgot-password" className="auth__forgot">Forgot password?</Link>}
@@ -155,7 +158,7 @@ export default function Auth({ mode }) {
         </button>
         {googleEnabled && !demo && (
           <>
-            <p className="auth__or"><span>or</span></p>
+            <p className="auth__or"><span>or continue with</span></p>
             <GoogleButton onCredential={google} />
           </>
         )}
