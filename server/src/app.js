@@ -65,7 +65,7 @@ export function createApp() {
   app.use((err, _req, res, _next) => {
     if (err.type === 'entity.parse.failed') return res.status(400).json({ error: 'Invalid JSON.' })
     if (err.type === 'entity.too.large') return res.status(413).json({ error: 'Request too large.' })
-    if (err instanceof HttpError) return res.status(err.status).json({ error: err.message, ...(err.fields && { fields: err.fields }) })
+    if (err instanceof HttpError) return res.status(err.status).json({ error: err.message, ...(err.fields && { fields: err.fields }), ...(err.code && { code: err.code }) })
     console.error(err)
     res.status(500).json({ error: 'Something went wrong. Please try again.' })
   })

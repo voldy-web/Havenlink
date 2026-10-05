@@ -9,6 +9,7 @@ export const signToken = (user) => jwt.sign({ sub: user.id, role: user.role }, c
 export const publicUser = (row) => ({
   id: row.id, name: row.name, email: row.email, phone: row.phone, role: row.role, createdAt: row.created_at,
   emergencyName: row.emergency_name, emergencyPhone: row.emergency_phone, privacy: row.privacy,
+  hasPassword: Boolean(row.password_hash), // Google-only accounts have none until they choose one
 })
 
 // Protects a route: needs "Authorization: Bearer <token>". Puts the user on req.user.

@@ -1,9 +1,10 @@
 // An error we expect and can explain to the person using the site.
 export class HttpError extends Error {
-  constructor(status, message, fields) {
+  constructor(status, message, fields, code) {
     super(message)
     this.status = status
     this.fields = fields
+    this.code = code // a short word the website can react to, for example 'no_account'
   }
 }
 

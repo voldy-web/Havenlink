@@ -47,11 +47,12 @@ router.patch('/profile', async (req, res) => {
 
 router.post('/password', async (req, res) => {
   const { currentPassword, newPassword } = req.body ?? {}
-  if (typeof currentPassword !== 'string' || !(await bcrypt.compare(currentPassword, req.user.password_hash))) {
+  // A Google-only account has no password yet, so there is no "current" one to check.
+  if (req.user.password_hash && (typeof currentPassword !== 'string' || !(await bcrypt.compare(currentPassword, req.user.password_hash)))) {
     throw new HttpError(400, 'Please check your details and try again.', { currentPassword: 'That is not your current password.' })
   }
   failIfInvalid({ newPassword: checkNewPassword(newPassword) })
-  if (newPassword === currentPassword) {
+  if (req.user.password_hash && newPassword === currentPassword) {
     throw new HttpError(400, 'Please check your details and try again.', { newPassword: 'Choose a password you have not used just now.' })
   }
   const hash = await bcrypt.hash(newPassword, 12)
@@ -82,11 +83,16 @@ router.get('/export', async (req, res) => {
   res.json(data)
 })
 
-// Permanently deletes the account and everything tied to it (needs the password).
+// Permanently deletes the account and everything tied to it. Needs the password, or for a Google-only account
+// (no password) the account's email address typed out.
 router.post('/delete', async (req, res) => {
-  const { password } = req.body ?? {}
-  if (typeof password !== 'string' || !(await bcrypt.compare(password, req.user.password_hash))) {
-    throw new HttpError(400, 'Please check your details and try again.', { password: 'That password is not correct.' })
+  const { password, confirmEmail } = req.body ?? {}
+  if (req.user.password_hash) {
+    if (typeof password !== 'string' || !(await bcrypt.compare(password, req.user.password_hash))) {
+      throw new HttpError(400, 'Please check your details and try again.', { password: 'That password is not correct.' })
+    }
+  } else if (typeof confirmEmail !== 'string' || clean.email(confirmEmail) !== clean.email(req.user.email)) {
+    throw new HttpError(400, 'Please check your details and try again.', { password: 'Type your account email address to confirm.' })
   }
   await withTransaction((client) => client.query('delete from users where id = $1', [req.user.id]))
   res.status(204).end()

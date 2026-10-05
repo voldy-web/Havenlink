@@ -66,7 +66,7 @@ export default function Settings() {
   async function changePw(e) {
     e.preventDefault()
     const found = {}
-    if (!pw.current) found.current = 'Enter your current password.'
+    if (user.hasPassword !== false && !pw.current) found.current = 'Enter your current password.'
     if (pw.next.length < 8) found.next = 'Use at least 8 characters.'
     setPwErrors(found)
     setPwNotice('')
@@ -97,7 +97,7 @@ export default function Settings() {
     setBusy('delete')
     setDeleteError('')
     try {
-      await removeAccount(deletePw)
+      await removeAccount(deletePw, user.hasPassword === false)
       navigate('/', { replace: true })
     } catch (err) {
       setDeleteError(err.message)
@@ -154,10 +154,13 @@ export default function Settings() {
           <p className="st-muted">Demo mode keeps accounts in this browser and never stores passwords, so there is nothing to change here.</p>
         ) : (
           <>
+            {user.hasPassword === false && <p className="st-muted">You sign in with Google, so you have no password yet. Choose one if you also want to sign in with your email.</p>}
             <div className="st-grid">
-              <label className="st-field"><span>Current password</span>
-                <input type="password" value={pw.current} onChange={(e) => setPw({ ...pw, current: e.target.value })} aria-invalid={Boolean(pwErrors.current)} autoComplete="current-password" />
-                {pwErrors.current && <em>{pwErrors.current}</em>}</label>
+              {user.hasPassword !== false && (
+                <label className="st-field"><span>Current password</span>
+                  <input type="password" value={pw.current} onChange={(e) => setPw({ ...pw, current: e.target.value })} aria-invalid={Boolean(pwErrors.current)} autoComplete="current-password" />
+                  {pwErrors.current && <em>{pwErrors.current}</em>}</label>
+              )}
               <label className="st-field"><span>New password</span>
                 <input type="password" value={pw.next} onChange={(e) => setPw({ ...pw, next: e.target.value })} aria-invalid={Boolean(pwErrors.next)} autoComplete="new-password" />
                 {pwErrors.next && <em>{pwErrors.next}</em>}</label>
@@ -187,8 +190,13 @@ export default function Settings() {
         ) : (
           <form onSubmit={remove} noValidate>
             {!demo && (
-              <label className="st-field"><span>Enter your password to confirm</span>
-                <input type="password" value={deletePw} onChange={(e) => setDeletePw(e.target.value)} autoComplete="current-password" /></label>
+              user.hasPassword === false ? (
+                <label className="st-field"><span>Type your email address ({user.email}) to confirm</span>
+                  <input type="email" value={deletePw} onChange={(e) => setDeletePw(e.target.value)} autoComplete="off" /></label>
+              ) : (
+                <label className="st-field"><span>Enter your password to confirm</span>
+                  <input type="password" value={deletePw} onChange={(e) => setDeletePw(e.target.value)} autoComplete="current-password" /></label>
+              )
             )}
             {deleteError && <p className="st-error" role="alert">{deleteError}</p>}
             <div className="st-actions">

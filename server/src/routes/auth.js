@@ -6,8 +6,9 @@ import { config } from '../config.js'
 import { pool } from '../db/pool.js'
 import { withTransaction } from '../db/tx.js'
 import { sendMail } from '../utils/mailer.js'
+import { verifyGoogleToken } from '../utils/google.js'
 import { HttpError } from '../utils/errors.js'
-import { checkName, checkEmail, checkPhone, checkNewPassword, checkRole, clean } from '../utils/validate.js'
+import { ROLES_SELF_SERVE, checkName, checkEmail, checkPhone, checkNewPassword, checkRole, clean } from '../utils/validate.js'
 import { publicUser, requireAuth, signToken } from '../middleware/auth.js'
 
 const router = Router()
@@ -55,6 +56,37 @@ router.post('/login', limiter, async (req, res) => {
   const ok = await bcrypt.compare(password, rows[0]?.password_hash ?? dummyHash)
   if (!rows[0] || !ok) throw new HttpError(401, 'Incorrect email or password.')
   res.json({ user: publicUser(rows[0]), token: signToken(rows[0]) })
+})
+
+// ---- Continue with Google ----
+// The browser sends the token Google gave it; we verify it ourselves. Existing accounts are found by Google id
+// first, then by (Google-verified) email. Linking an existing email account wipes its old password and signs it
+// out everywhere: sign-ups are not email-verified yet, so someone else may have registered that address first.
+router.post('/google', limiter, async (req, res) => {
+  if (!config.googleClientId) throw new HttpError(503, 'Google sign-in is not set up on this site yet.')
+  const { credential, role } = req.body ?? {}
+  const g = await verifyGoogleToken(credential)
+
+  const byGoogle = (await pool.query('select * from users where google_id = $1', [g.sub])).rows[0]
+  if (byGoogle) return res.json({ user: publicUser(byGoogle), token: signToken(byGoogle) })
+
+  const byEmail = (await pool.query('select * from users where lower(email) = $1', [clean.email(g.email)])).rows[0]
+  if (byEmail) {
+    if (byEmail.role === 'admin') throw new HttpError(403, 'Admin accounts sign in with their password.')
+    const { rows } = await pool.query(
+      `update users set google_id = $1, password_hash = null, password_changed_at = date_trunc('second', now()) where id = $2 returning *`,
+      [g.sub, byEmail.id],
+    )
+    return res.json({ user: publicUser(rows[0]), token: signToken(rows[0]), linked: Boolean(byEmail.password_hash) })
+  }
+
+  if (role === undefined) throw new HttpError(404, 'There is no Haven Link account for this Google account yet. Create one first so you can choose your account type.', undefined, 'no_account')
+  if (!ROLES_SELF_SERVE.includes(role)) throw new HttpError(400, 'Choose a valid account type.')
+  const { rows } = await pool.query(
+    "insert into users (name, email, phone, role, password_hash, google_id) values ($1, $2, '', $3, null, $4) returning *",
+    [g.name.slice(0, 80), clean.email(g.email), role, g.sub],
+  )
+  res.status(201).json({ user: publicUser(rows[0]), token: signToken(rows[0]), created: true })
 })
 
 // ---- Forgotten password ----

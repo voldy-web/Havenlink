@@ -72,9 +72,9 @@ export async function loadSession() {
 // Each returns { user } on success, or { error, fields } to show in the form.
 async function viaApi(path, body) {
   const res = await api(path, { method: 'POST', body })
-  if (!res.ok) return { error: res.data.error || 'Something went wrong. Please try again.', fields: res.data.fields }
+  if (!res.ok) return { error: res.data.error || 'Something went wrong. Please try again.', fields: res.data.fields, code: res.data.code }
   setToken(res.data.token)
-  return { user: res.data.user }
+  return { user: res.data.user, linked: Boolean(res.data.linked) }
 }
 
 export const registerAccount = (details) => (apiEnabled ? viaApi('/auth/register', details) : demoRegister(details))
@@ -84,6 +84,9 @@ export function signOut() {
   if (apiEnabled) setToken(null)
   else demoSignOut()
 }
+
+// "Continue with Google": `credential` is the token Google gave the browser. `role` is only sent when creating an account.
+export const googleSignIn = (credential, role) => viaApi('/auth/google', { credential, ...(role && { role }) })
 
 export const isDemoAuth = !apiEnabled
 
@@ -103,7 +106,8 @@ export async function updateProfile(details) {
 
 // Real accounts only. The server signs out older logins and returns a fresh token.
 export async function changePassword(currentPassword, newPassword) {
-  const data = await apiOrThrow('/account/password', { method: 'POST', body: { currentPassword, newPassword } })
+  // A Google-only account has no current password: it is left out.
+  const data = await apiOrThrow('/account/password', { method: 'POST', body: { ...(currentPassword && { currentPassword }), newPassword } })
   setToken(data.token)
   return data.user
 }
@@ -119,10 +123,10 @@ export async function exportMyData(user) {
   URL.revokeObjectURL(url)
 }
 
-// Permanently deletes the account (real accounts need the password).
-export async function deleteAccount(password) {
+// Permanently deletes the account. Real accounts need the password, or (Google-only accounts) their email typed out.
+export async function deleteAccount(secret, byEmail = false) {
   if (apiEnabled) {
-    await apiOrThrow('/account/delete', { method: 'POST', body: { password } })
+    await apiOrThrow('/account/delete', { method: 'POST', body: byEmail ? { confirmEmail: secret } : { password: secret } })
     setToken(null)
     return
   }

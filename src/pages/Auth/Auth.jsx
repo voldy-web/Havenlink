@@ -1,6 +1,8 @@
 import { useState } from 'react'
 import { Link, Navigate, useNavigate, useSearchParams } from 'react-router-dom'
 import Icon from '../../components/ui/Icon'
+import GoogleButton from '../../components/auth/GoogleButton'
+import { googleEnabled } from '../../services/googleConfig'
 import { useAuth } from '../../hooks/useAuth'
 import { roles } from '../../data/roles'
 import './Auth.css'
@@ -17,7 +19,7 @@ const points = [
 
 export default function Auth({ mode }) {
   const isRegister = mode === 'register'
-  const { user, loading, demo, login, register } = useAuth()
+  const { user, loading, demo, login, register, loginWithGoogle, continueAs } = useAuth()
   const navigate = useNavigate()
   const [params] = useSearchParams()
   const next = safeNext(params.get('next'))
@@ -26,10 +28,11 @@ export default function Auth({ mode }) {
   const [errors, setErrors] = useState({})
   const [busy, setBusy] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
+  const [linkedUser, setLinkedUser] = useState(null) // set after an email account is linked to Google
   const set = (patch) => setForm((f) => ({ ...f, ...patch }))
 
   if (loading) return null
-  if (user) return <Navigate to={next} replace />
+  if (user && !linkedUser) return <Navigate to={next} replace />
 
   async function submit(e) {
     e.preventDefault()
@@ -47,6 +50,28 @@ export default function Auth({ mode }) {
     setBusy(false)
     if (result.error) return setErrors({ form: result.error, ...result.fields })
     navigate(next, { replace: true })
+  }
+
+  async function google(credential) {
+    if (isRegister && !form.agree) return setErrors({ agree: 'Please accept the terms, then continue with Google again.' })
+    setErrors({})
+    const result = await loginWithGoogle(credential, isRegister ? form.role : undefined)
+    if (result.error) return setErrors({ form: result.error })
+    if (result.linked) return setLinkedUser(result.user)
+    navigate(next, { replace: true })
+  }
+
+  if (linkedUser) {
+    return (
+      <div className="container auth auth--single">
+        <div className="auth__card">
+          <h1 className="auth__title">Google account linked</h1>
+          <p className="auth__ok" role="status"><Icon name="check" size={16} /> <span>You already had a Haven Link account with {linkedUser.email}. It is now linked to your Google account. For safety, its old password was removed and other devices were signed out.</span></p>
+          <p className="auth__hint">From now on, use <b>Continue with Google</b>. If you want a password again, use “Forgot password?” on the sign-in page.</p>
+          <button type="button" className="auth__submit" onClick={() => { continueAs(linkedUser); navigate(next, { replace: true }) }}>Continue <Icon name="arrow" size={16} /></button>
+        </div>
+      </div>
+    )
   }
 
   const other = isRegister ? '/login' : '/register'
@@ -128,6 +153,12 @@ export default function Auth({ mode }) {
         <button type="submit" className="auth__submit" disabled={busy}>
           {busy ? 'Please wait…' : isRegister ? 'Create Account' : 'Sign In'} <Icon name="arrow" size={16} />
         </button>
+        {googleEnabled && !demo && (
+          <>
+            <p className="auth__or"><span>or</span></p>
+            <GoogleButton onCredential={google} />
+          </>
+        )}
         <p className="auth__switch">
           {isRegister ? 'Already have an account?' : 'New to Haven Link?'} <Link to={otherLink}>{isRegister ? 'Sign in instead' : 'Create an account'}</Link>
         </p>

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { AuthContext } from './AuthContext'
-import { loadSession, registerAccount, signIn, signOut, updateProfile, changePassword, deleteAccount } from '../services/authService'
+import { loadSession, registerAccount, signIn, googleSignIn, signOut, updateProfile, changePassword, deleteAccount } from '../services/authService'
 import { apiEnabled } from '../services/api'
 
 export default function AuthProvider({ children }) {
@@ -31,6 +31,15 @@ export default function AuthProvider({ children }) {
     return result
   }, [])
 
+  // When an existing email account gets linked to Google, the person is told first (see Auth.jsx) and then
+  // continues with continueAs(); every other Google sign-in goes straight in.
+  const loginWithGoogle = useCallback(async (credential, role) => {
+    const result = await googleSignIn(credential, role)
+    if (result.user && !result.linked) setUser(result.user)
+    return result
+  }, [])
+  const continueAs = useCallback((u) => setUser(u), [])
+
   const logout = useCallback(() => {
     signOut()
     setUser(null)
@@ -46,14 +55,14 @@ export default function AuthProvider({ children }) {
     setUser(await changePassword(current, next))
   }, [])
 
-  const removeAccount = useCallback(async (password) => {
-    await deleteAccount(password)
+  const removeAccount = useCallback(async (secret, byEmail) => {
+    await deleteAccount(secret, byEmail)
     setUser(null)
   }, [])
 
   const value = useMemo(
-    () => ({ user, loading, demo: !apiEnabled, register, login, logout, saveProfile, setPassword, removeAccount }),
-    [user, loading, register, login, logout, saveProfile, setPassword, removeAccount],
+    () => ({ user, loading, demo: !apiEnabled, register, login, loginWithGoogle, continueAs, logout, saveProfile, setPassword, removeAccount }),
+    [user, loading, register, login, loginWithGoogle, continueAs, logout, saveProfile, setPassword, removeAccount],
   )
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }
